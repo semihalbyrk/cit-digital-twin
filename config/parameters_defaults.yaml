@@ -1,0 +1,20 @@
+vehicle:
+  truck_speed_kmh: 35
+  capacity_m3: 20
+  fuel_consumption_kml: 6.0
+  fuel_price_usd_per_liter: 1.50
+
+operational:
+  shift_duration_hours: 8.0
+  service_time_per_task_minutes: 2.5
+  depot_unload_time_minutes: 15
+  labor_rate_usd_per_hour: 25
+
+bins:
+  bin_1100l_weight_kg: 550
+  bin_240l_weight_kg: 120
+  container_weight_kg: 300
+  average_fill_percent: 80
+
+emissions:
+  co2_per_liter_kg: 2.31
