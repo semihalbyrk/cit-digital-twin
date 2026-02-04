@@ -1,0 +1,21 @@
+task_files:
+  expected_columns:
+    - Task ID
+    - Route Name
+    - Vehicle ID
+    - Date
+    - Arrive Time
+    - Operation
+    - Task Status
+    - Service Point
+    - Asset Types
+    - Completed Asset Types
+    - Asset Collects
+  task_status_enum:
+    - Done
+    - Visited
+    - To-Do
+
+distance_matrix:
+  format: "CSV with service points as rows/columns"
+  values_unit: "kilometers"
