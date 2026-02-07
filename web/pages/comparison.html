@@ -1,0 +1,165 @@
+<div class="page comparison">
+  <!-- Back Button & Header -->
+  <div class="route-header mb-20">
+    <button class="btn-back" onclick="navigateToPage('what-if-analysis')">&#8592; Back to What-If Analysis</button>
+    <div class="route-header-content">
+      <div class="route-header-left">
+        <h1>Scenario Comparison</h1>
+        <p class="subtitle">Compare V0 Baseline with optimized scenarios</p>
+      </div>
+      <div class="route-header-right">
+        <span class="badge badge-info">COMPARISON MODE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scenario Selector -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Select Scenario to Compare</h2>
+    </div>
+    <div class="two-column-grid" style="gap:20px;">
+      <div class="form-group">
+        <label>Baseline</label>
+        <select id="baseline-version" disabled>
+          <option value="v0" selected>V0 - Current Operations (Baseline)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Optimized Scenario</label>
+        <select id="scenario-version" onchange="updateComparisonTable()">
+          <!-- Populated by JavaScript -->
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Table with Sections -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Metrics Comparison</h2>
+      <span class="text-muted text-sm" id="comparison-date"></span>
+    </div>
+
+    <div class="comparison-table-container">
+      <table class="comparison-table" id="comparison-table">
+        <thead>
+          <tr>
+            <th class="metric-col">Metric</th>
+            <th class="value-col">V0 Baseline</th>
+            <th class="value-col">V1 Scenario</th>
+            <th class="delta-col">Change</th>
+          </tr>
+        </thead>
+        <tbody id="comparison-table-body">
+          <!-- Operational Section -->
+          <tr class="section-header">
+            <td colspan="4">Operational Metrics</td>
+          </tr>
+          <tr>
+            <td class="metric-col">Total Tasks</td>
+            <td class="value-col" id="cmp-v0-tasks">--</td>
+            <td class="value-col" id="cmp-v1-tasks">--</td>
+            <td class="delta-col" id="cmp-delta-tasks">--</td>
+          </tr>
+          <tr>
+            <td class="metric-col">Service Points</td>
+            <td class="value-col" id="cmp-v0-sps">--</td>
+            <td class="value-col" id="cmp-v1-sps">--</td>
+            <td class="delta-col" id="cmp-delta-sps">--</td>
+          </tr>
+          <tr>
+            <td class="metric-col">Total Distance</td>
+            <td class="value-col" id="cmp-v0-distance">--</td>
+            <td class="value-col" id="cmp-v1-distance">--</td>
+            <td class="delta-col" id="cmp-delta-distance">--</td>
+          </tr>
+          <tr>
+            <td class="metric-col">Total Time</td>
+            <td class="value-col" id="cmp-v0-time">--</td>
+            <td class="value-col" id="cmp-v1-time">--</td>
+            <td class="delta-col" id="cmp-delta-time">--</td>
+          </tr>
+          <tr>
+            <td class="metric-col">Completion Rate</td>
+            <td class="value-col" id="cmp-v0-rate">--</td>
+            <td class="value-col" id="cmp-v1-rate">--</td>
+            <td class="delta-col" id="cmp-delta-rate">--</td>
+          </tr>
+
+          <!-- Financial Section -->
+          <tr class="section-header">
+            <td colspan="4">Financial Metrics</td>
+          </tr>
+          <tr>
+            <td class="metric-col">Fuel Cost</td>
+            <td class="value-col" id="cmp-v0-fuel-cost">--</td>
+            <td class="value-col" id="cmp-v1-fuel-cost">--</td>
+            <td class="delta-col" id="cmp-delta-fuel-cost">--</td>
+          </tr>
+          <tr>
+            <td class="metric-col">Labor Cost</td>
+            <td class="value-col" id="cmp-v0-labor-cost">--</td>
+            <td class="value-col" id="cmp-v1-labor-cost">--</td>
+            <td class="delta-col" id="cmp-delta-labor-cost">--</td>
+          </tr>
+          <tr class="highlight-row">
+            <td class="metric-col"><strong>Total Cost</strong></td>
+            <td class="value-col" id="cmp-v0-total-cost">--</td>
+            <td class="value-col" id="cmp-v1-total-cost">--</td>
+            <td class="delta-col" id="cmp-delta-total-cost">--</td>
+          </tr>
+
+          <!-- Environmental Section -->
+          <tr class="section-header">
+            <td colspan="4">Environmental Metrics</td>
+          </tr>
+          <tr>
+            <td class="metric-col">Fuel Consumption</td>
+            <td class="value-col" id="cmp-v0-fuel-used">--</td>
+            <td class="value-col" id="cmp-v1-fuel-used">--</td>
+            <td class="delta-col" id="cmp-delta-fuel-used">--</td>
+          </tr>
+          <tr>
+            <td class="metric-col">CO2 Emissions</td>
+            <td class="value-col" id="cmp-v0-co2">--</td>
+            <td class="value-col" id="cmp-v1-co2">--</td>
+            <td class="delta-col" id="cmp-delta-co2">--</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Impact Summary - Narrative -->
+  <div class="card impact-narrative">
+    <div class="card-header">
+      <h2>Impact Summary</h2>
+    </div>
+    <div class="narrative-content" id="narrative-content">
+      <p class="text-muted">Select a scenario above to see the impact narrative.</p>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Actions</h2>
+    </div>
+    <div class="action-grid">
+      <button class="btn-secondary" onclick="navigateToPage('what-if-analysis')">
+        &#9998; Edit Scenario
+      </button>
+      <button class="btn-secondary" onclick="resetComparison()">
+        &#8635; Reset Comparison
+      </button>
+      <button class="btn-primary" onclick="createNewScenario()">
+        + Create New Scenario (V2)
+      </button>
+      <button class="btn-success" onclick="exportComparison()">
+        &#128190; Export Report
+      </button>
+    </div>
+  </div>
+</div>

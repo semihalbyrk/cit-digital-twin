@@ -1,0 +1,363 @@
+/* CIT Digital Twin - KPI Cards */
+
+.kpi-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: all var(--transition-normal);
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: var(--border-color);
+  transition: background-color var(--transition-fast);
+}
+
+.kpi-card.clickable {
+  cursor: pointer;
+}
+
+/* Status-based left border */
+.kpi-card.done::before {
+  background-color: var(--color-done);
+}
+
+.kpi-card.visited::before {
+  background-color: var(--color-visited);
+}
+
+.kpi-card.todo::before {
+  background-color: var(--color-todo);
+}
+
+.kpi-card.info::before {
+  background-color: var(--color-info);
+}
+
+/* KPI Card Content */
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.kpi-icon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-light);
+  border-radius: var(--radius-md);
+}
+
+.kpi-card.done .kpi-icon {
+  background-color: rgba(54, 167, 52, 0.15);
+}
+
+.kpi-card.visited .kpi-icon {
+  background-color: rgba(245, 158, 11, 0.15);
+}
+
+.kpi-card.todo .kpi-icon {
+  background-color: rgba(224, 60, 57, 0.15);
+}
+
+.kpi-card.info .kpi-icon {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+.kpi-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-light);
+}
+
+.kpi-trend.up {
+  color: var(--color-done);
+}
+
+.kpi-trend.down {
+  color: var(--color-todo);
+}
+
+.kpi-body {
+  padding-left: 8px;
+}
+
+.kpi-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  margin-bottom: 6px;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.kpi-card.done .kpi-value {
+  color: var(--color-done);
+}
+
+.kpi-card.visited .kpi-value {
+  color: var(--color-visited);
+}
+
+.kpi-card.todo .kpi-value {
+  color: var(--color-todo);
+}
+
+.kpi-card.info .kpi-value {
+  color: var(--color-info);
+}
+
+.kpi-subtext {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Compact KPI Card */
+.kpi-card.compact {
+  padding: 16px;
+}
+
+.kpi-card.compact .kpi-icon {
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+}
+
+.kpi-card.compact .kpi-value {
+  font-size: 22px;
+}
+
+.kpi-card.compact .kpi-label {
+  font-size: 11px;
+}
+
+/* Horizontal KPI Card */
+.kpi-card.horizontal {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.kpi-card.horizontal .kpi-header {
+  margin-bottom: 0;
+}
+
+.kpi-card.horizontal .kpi-body {
+  flex: 1;
+  padding-left: 0;
+}
+
+.kpi-card.horizontal .kpi-value {
+  font-size: 20px;
+  margin-bottom: 0;
+}
+
+/* Mini KPI Card (for grids) */
+.kpi-mini {
+  background-color: var(--bg-light);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kpi-mini-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.kpi-mini-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Summary Card */
+.summary-card {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+  border: none;
+  padding: 24px;
+}
+
+.summary-card .kpi-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.summary-card .kpi-value {
+  color: white;
+}
+
+.summary-card .kpi-subtext {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Stat Cards Row */
+.stat-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-item-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stat-item-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Progress Card */
+.progress-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.progress-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.progress-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-blue);
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: var(--bg-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--accent-blue);
+  border-radius: 4px;
+  transition: width var(--transition-normal);
+}
+
+.progress-fill.done {
+  background-color: var(--color-done);
+}
+
+.progress-fill.visited {
+  background-color: var(--color-visited);
+}
+
+.progress-fill.todo {
+  background-color: var(--color-todo);
+}
+
+/* Comparison Card */
+.comparison-card {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: center;
+  padding: 20px;
+}
+
+.comparison-value {
+  text-align: center;
+}
+
+.comparison-value-number {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.comparison-value-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.comparison-vs {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 8px 16px;
+  background-color: var(--bg-light);
+  border-radius: 20px;
+}
+
+.comparison-delta {
+  text-align: center;
+  padding: 12px;
+  background-color: var(--bg-light);
+  border-radius: var(--radius-md);
+}
+
+.comparison-delta.positive {
+  background-color: rgba(54, 167, 52, 0.1);
+}
+
+.comparison-delta.negative {
+  background-color: rgba(224, 60, 57, 0.1);
+}
+
+.comparison-delta-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.comparison-delta.positive .comparison-delta-value {
+  color: var(--color-done);
+}
+
+.comparison-delta.negative .comparison-delta-value {
+  color: var(--color-todo);
+}

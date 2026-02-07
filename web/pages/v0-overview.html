@@ -1,0 +1,54 @@
+<div class="page v0-overview">
+  <!-- KPI Cards -->
+  <div class="kpi-grid kpi-grid-6" id="kpi-grid-overview">
+    <!-- Populated by JavaScript -->
+  </div>
+
+  <!-- Routes Table -->
+  <div class="card">
+    <div class="card-header">
+      <h2>All Routes Performance</h2>
+      <div class="table-toolbar-right">
+        <span class="text-sm text-muted" id="route-count-label"></span>
+      </div>
+    </div>
+    <div class="table-container table-scroll">
+      <table id="routes-table">
+        <thead>
+          <tr>
+            <th class="sortable">Route Name</th>
+            <th class="sortable">Day</th>
+            <th>Vehicle</th>
+            <th class="sortable numeric">Done</th>
+            <th class="sortable numeric">Visited</th>
+            <th class="sortable numeric">To-Do</th>
+            <th class="sortable numeric">Distance</th>
+            <th class="sortable numeric">Time</th>
+            <th class="sortable numeric">Cost</th>
+            <th class="sortable">Rate</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-grid">
+    <div class="card">
+      <h2>Daily Task Completion</h2>
+      <div class="chart-container">
+        <canvas id="daily-completion-chart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Zone Performance</h2>
+      <div class="chart-container">
+        <canvas id="zone-performance-chart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,85 @@
+<div class="page route-selector">
+  <!-- Route Info Hero -->
+  <div class="card route-info-hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1>CIT Route Optimization Platform</h1>
+        <p class="hero-subtitle">Analyze route performance and plan improvements</p>
+      </div>
+      <div class="hero-badge">
+        <span class="baseline-badge">V0 BASELINE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Route Selection -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Select a Route to Analyze</h2>
+      <div class="operation-selector">
+        <span class="operation-label">Operation:</span>
+        <span class="operation-value">Waste Collection</span>
+      </div>
+    </div>
+
+    <p class="section-description">
+      Choose a date to analyze the Zone 2 B (Day) route performance.
+      Each row represents a route instance with its execution metrics.
+    </p>
+
+    <div class="table-container">
+      <table id="date-selector-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Route</th>
+            <th class="numeric">Tasks</th>
+            <th class="numeric">Done</th>
+            <th class="numeric">Visited</th>
+            <th class="numeric">Rate</th>
+            <th class="col-actions">Action</th>
+          </tr>
+        </thead>
+        <tbody id="date-selector-body">
+          <!-- Populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Route Information Box -->
+  <div class="card route-about">
+    <div class="card-header">
+      <h2>About This Route</h2>
+    </div>
+    <div class="about-content">
+      <div class="about-grid">
+        <div class="about-item">
+          <span class="about-label">Route Name</span>
+          <span class="about-value">Zone 2 B (Day) - V 2.0</span>
+        </div>
+        <div class="about-item">
+          <span class="about-label">Type</span>
+          <span class="about-value">Daytime waste collection route</span>
+        </div>
+        <div class="about-item">
+          <span class="about-label">Zone</span>
+          <span class="about-value">Albada Zone-2</span>
+        </div>
+        <div class="about-item">
+          <span class="about-label">Schedule</span>
+          <span class="about-value">Tue, Wed, Thu, Sat, Sun (5 days/week)</span>
+        </div>
+        <div class="about-item">
+          <span class="about-label">Service Points</span>
+          <span class="about-value">330 unique locations</span>
+        </div>
+        <div class="about-item">
+          <span class="about-label">Assigned Vehicle</span>
+          <span class="about-value">REL-4</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

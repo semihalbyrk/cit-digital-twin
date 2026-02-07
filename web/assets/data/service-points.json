@@ -1,0 +1,452 @@
+[
+  {
+    "sp_id": "Z2-BDB-2710",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.463779, 35.023317",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.72
+  },
+  {
+    "sp_id": "Z2-BDB-3219",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.459215, 35.034533",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.81
+  },
+  {
+    "sp_id": "Z2-BDB-3329",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.464104, 35.031118",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.65
+  },
+  {
+    "sp_id": "Z2-BDB-3214",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.4647, 35.0257",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.38
+  },
+  {
+    "sp_id": "Z2-BDB-1584",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.467098, 35.030908",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.89
+  },
+  {
+    "sp_id": "Z2-BDB-0077",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.4631766, 35.0212833",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.55
+  },
+  {
+    "sp_id": "Z2-BDB-5996",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.461232, 35.028093",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.42
+  },
+  {
+    "sp_id": "Z2-BDB-4193",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.463127, 35.041533",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.28
+  },
+  {
+    "sp_id": "Z2-BDB-5970",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.571392, 35.035257",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.76
+  },
+  {
+    "sp_id": "Z2-BDB-1214",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.459403, 35.01183",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.33
+  },
+  {
+    "sp_id": "Z2-BDB-2965",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.472352, 35.033387",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.91
+  },
+  {
+    "sp_id": "Z2-BDB-1899",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.464083, 35.04102",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.47
+  },
+  {
+    "sp_id": "Z2-BDB-0768",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.459268, 35.037219",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.84
+  },
+  {
+    "sp_id": "Z2-BDB-1806",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.468615, 35.033938",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.62
+  },
+  {
+    "sp_id": "Z2-BDB-5983",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.459618, 35.022022",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.35
+  },
+  {
+    "sp_id": "Z2-BDB-1185",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.463972, 34.997746",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.78
+  },
+  {
+    "sp_id": "Z2-BDB-0756",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.463575, 35.035138",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.69
+  },
+  {
+    "sp_id": "Z2-BDB-0948",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.460897, 35.036375",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.58
+  },
+  {
+    "sp_id": "Z2-BDB-0820",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.463175, 35.035888",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.44
+  },
+  {
+    "sp_id": "Z2-BDB-0454",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.463648, 35.036297",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.87
+  },
+  {
+    "sp_id": "Z1-A-0012",
+    "zone": "Zone 1",
+    "route": "Zone 1 A (Day)",
+    "coordinates": "28.451200, 35.012450",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.74
+  },
+  {
+    "sp_id": "Z1-A-0045",
+    "zone": "Zone 1",
+    "route": "Zone 1 A (Day)",
+    "coordinates": "28.448300, 35.015670",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.82
+  },
+  {
+    "sp_id": "Z1-A-0078",
+    "zone": "Zone 1",
+    "route": "Zone 1 A (Day)",
+    "coordinates": "28.453500, 35.008900",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.31
+  },
+  {
+    "sp_id": "Z1-A-0103",
+    "zone": "Zone 1",
+    "route": "Zone 1 A (Day)",
+    "coordinates": "28.449800, 35.011200",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.56
+  },
+  {
+    "sp_id": "Z1-A-0156",
+    "zone": "Zone 1",
+    "route": "Zone 1 A (Day)",
+    "coordinates": "28.455100, 35.014300",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.93
+  },
+  {
+    "sp_id": "Z1-B-0015",
+    "zone": "Zone 1",
+    "route": "Zone 1 B (Night)",
+    "coordinates": "28.447600, 35.018900",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.67
+  },
+  {
+    "sp_id": "Z1-B-0038",
+    "zone": "Zone 1",
+    "route": "Zone 1 B (Night)",
+    "coordinates": "28.452400, 35.016700",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.29
+  },
+  {
+    "sp_id": "Z1-B-0067",
+    "zone": "Zone 1",
+    "route": "Zone 1 B (Night)",
+    "coordinates": "28.445900, 35.020100",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.71
+  },
+  {
+    "sp_id": "Z1-C-0008",
+    "zone": "Zone 1",
+    "route": "Zone 1 C (Day)",
+    "coordinates": "28.450700, 35.009800",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.85
+  },
+  {
+    "sp_id": "Z1-C-0041",
+    "zone": "Zone 1",
+    "route": "Zone 1 C (Day)",
+    "coordinates": "28.454200, 35.013500",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.39
+  },
+  {
+    "sp_id": "Z2-A-0023",
+    "zone": "Zone 2",
+    "route": "Zone 2 A (Day)",
+    "coordinates": "28.461500, 35.025800",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.77
+  },
+  {
+    "sp_id": "Z2-A-0056",
+    "zone": "Zone 2",
+    "route": "Zone 2 A (Day)",
+    "coordinates": "28.458300, 35.029100",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.63
+  },
+  {
+    "sp_id": "Z2-A-0089",
+    "zone": "Zone 2",
+    "route": "Zone 2 A (Day)",
+    "coordinates": "28.465100, 35.022300",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.41
+  },
+  {
+    "sp_id": "Z2-C-0016",
+    "zone": "Zone 2",
+    "route": "Zone 2 C (Night)",
+    "coordinates": "28.462800, 35.030200",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.52
+  },
+  {
+    "sp_id": "Z2-C-0049",
+    "zone": "Zone 2",
+    "route": "Zone 2 C (Night)",
+    "coordinates": "28.466400, 35.027600",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.34
+  },
+  {
+    "sp_id": "Z3-A-0011",
+    "zone": "Zone 3",
+    "route": "Zone 3 A (Day)",
+    "coordinates": "28.475200, 35.042100",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.79
+  },
+  {
+    "sp_id": "Z3-A-0044",
+    "zone": "Zone 3",
+    "route": "Zone 3 A (Day)",
+    "coordinates": "28.478600, 35.039800",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.88
+  },
+  {
+    "sp_id": "Z3-A-0077",
+    "zone": "Zone 3",
+    "route": "Zone 3 A (Day)",
+    "coordinates": "28.472300, 35.044500",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.36
+  },
+  {
+    "sp_id": "Z3-B-0019",
+    "zone": "Zone 3",
+    "route": "Zone 3 B (Night)",
+    "coordinates": "28.476800, 35.041300",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.61
+  },
+  {
+    "sp_id": "Z3-B-0042",
+    "zone": "Zone 3",
+    "route": "Zone 3 B (Night)",
+    "coordinates": "28.473500, 35.038700",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.73
+  },
+  {
+    "sp_id": "Z3-C-0009",
+    "zone": "Zone 3",
+    "route": "Zone 3 C (Day)",
+    "coordinates": "28.479100, 35.036900",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.46
+  },
+  {
+    "sp_id": "Z3-C-0042",
+    "zone": "Zone 3",
+    "route": "Zone 3 C (Day)",
+    "coordinates": "28.474800, 35.043200",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.27
+  },
+  {
+    "sp_id": "Z4-A-0014",
+    "zone": "Zone 4",
+    "route": "Zone 4 A (Day)",
+    "coordinates": "28.482300, 35.051200",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.86
+  },
+  {
+    "sp_id": "Z4-A-0047",
+    "zone": "Zone 4",
+    "route": "Zone 4 A (Day)",
+    "coordinates": "28.485700, 35.048900",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.68
+  },
+  {
+    "sp_id": "Z4-A-0080",
+    "zone": "Zone 4",
+    "route": "Zone 4 A (Day)",
+    "coordinates": "28.479500, 35.053600",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.43
+  },
+  {
+    "sp_id": "Z4-B-0021",
+    "zone": "Zone 4",
+    "route": "Zone 4 B (Night)",
+    "coordinates": "28.483900, 35.050100",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.75
+  },
+  {
+    "sp_id": "Z4-B-0054",
+    "zone": "Zone 4",
+    "route": "Zone 4 B (Night)",
+    "coordinates": "28.481200, 35.047300",
+    "asset_type": "1100L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.59
+  },
+  {
+    "sp_id": "Z4-B-0087",
+    "zone": "Zone 4",
+    "route": "Zone 4 B (Night)",
+    "coordinates": "28.486500, 35.054800",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.32
+  },
+  {
+    "sp_id": "Z2-BDB-1803",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.463735, 35.036632",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.48
+  },
+  {
+    "sp_id": "Z2-BDB-1163",
+    "zone": "Zone 2",
+    "route": "Zone 2 B (Day)",
+    "coordinates": "28.462677, 35.036289",
+    "asset_type": "240L",
+    "current_frequency": "Daily",
+    "avg_fill_rate": 0.53
+  }
+]

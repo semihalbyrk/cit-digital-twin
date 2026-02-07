@@ -1,0 +1,294 @@
+/* CIT Digital Twin - Sidebar Navigation */
+
+.sidebar {
+  width: 260px;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+/* Logo Section */
+.sidebar-logo {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--primary-dark));
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.sidebar-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logo-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sidebar-logo-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Navigation */
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 0;
+}
+
+.nav-section {
+  margin-bottom: 8px;
+}
+
+.nav-section-title {
+  padding: 12px 20px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.nav-item {
+  padding: 12px 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border-left: 3px solid transparent;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  border-left-color: var(--accent-blue);
+  background-color: var(--bg-active);
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+
+.nav-item-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.nav-item-text {
+  flex: 1;
+}
+
+.nav-item-badge {
+  background-color: var(--accent-blue);
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* Collapsible Section */
+.nav-collapse {
+  margin-bottom: 4px;
+}
+
+.nav-collapse-item {
+  padding: 12px 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  transition: all var(--transition-fast);
+}
+
+.nav-collapse-item:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.nav-collapse-item .nav-item-icon {
+  width: 20px;
+  text-align: center;
+}
+
+.collapse-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  transition: transform var(--transition-fast);
+  margin-left: auto;
+}
+
+.nav-collapse.open .collapse-icon {
+  transform: rotate(90deg);
+}
+
+.nav-children {
+  display: none;
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.nav-collapse.open .nav-children {
+  display: block;
+}
+
+.nav-child-item {
+  padding: 10px 20px 10px 52px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.nav-child-item:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-hover);
+}
+
+.nav-child-item.active {
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+
+.nav-child-item-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+}
+
+.nav-child-item.active .nav-child-item-dot {
+  background-color: var(--accent-blue);
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.sidebar-footer-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.sidebar-footer-item:hover {
+  color: var(--text-primary);
+}
+
+/* Quick Stats in Sidebar */
+.sidebar-stats {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-stats-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.sidebar-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.sidebar-stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.sidebar-stat-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sidebar-stat-value.done {
+  color: var(--color-done);
+}
+
+.sidebar-stat-value.visited {
+  color: var(--color-visited);
+}
+
+.sidebar-stat-value.todo {
+  color: var(--color-todo);
+}
+
+/* Collapsed Sidebar */
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.sidebar.collapsed .sidebar-logo-text,
+.sidebar.collapsed .nav-section-title,
+.sidebar.collapsed .nav-item-text,
+.sidebar.collapsed .nav-child-item,
+.sidebar.collapsed .collapse-icon,
+.sidebar.collapsed .nav-item-badge,
+.sidebar.collapsed .sidebar-stats,
+.sidebar.collapsed .sidebar-footer {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-logo {
+  justify-content: center;
+  padding: 16px;
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 14px;
+}
+
+.sidebar.collapsed .nav-item-icon {
+  font-size: 20px;
+}
+
+.sidebar.collapsed .nav-collapse-item {
+  justify-content: center;
+  padding: 14px;
+}
