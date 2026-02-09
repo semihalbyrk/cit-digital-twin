@@ -466,9 +466,9 @@
   }
 }
 
-/* Dark Mode - Already default, but ensure consistency */
-@media (prefers-color-scheme: dark) {
-  /* Already dark theme by default */
+/* Light Mode - Default theme */
+@media (prefers-color-scheme: light) {
+  /* Light theme is the default */
 }
 
 /* Mobile Menu Button (Hidden by default, shown on mobile) */

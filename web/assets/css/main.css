@@ -77,8 +77,9 @@ body {
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: 30px;
+  padding: 24px;
   scroll-behavior: smooth;
+  background-color: var(--bg-light);
 }
 
 /* Page Wrapper */
@@ -275,7 +276,7 @@ p {
 }
 
 .btn-primary:hover {
-  background-color: #0077AA;
+  background-color: #2563EB;
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
@@ -436,17 +437,17 @@ p {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-sidebar);
+  background: var(--bg-gray);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: #CBD5E1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-light);
+  background: #94A3B8;
 }
 
 /* Loading State */
@@ -516,8 +517,8 @@ p {
   left: 50%;
   transform: translateX(-50%);
   padding: 6px 12px;
-  background-color: var(--bg-light);
-  color: var(--text-primary);
+  background-color: var(--primary-dark);
+  color: var(--text-on-dark);
   font-size: 12px;
   border-radius: var(--radius-sm);
   white-space: nowrap;
@@ -701,7 +702,7 @@ p {
 }
 
 #date-selector-table tbody tr:hover {
-  background-color: rgba(0, 153, 204, 0.08);
+  background-color: rgba(59, 130, 246, 0.08);
 }
 
 /* Select Button */
@@ -718,6 +719,6 @@ p {
 }
 
 .btn-select:hover {
-  background-color: #0077AA;
+  background-color: #2563EB;
   transform: translateY(-1px);
 }

@@ -1,63 +1,70 @@
 /* CIT Digital Twin - Color Palette & Design Tokens */
+/* Branding: Light Theme with Navy Primary */
+
 :root {
   /* Primary Colors */
   --primary-dark: #0B2B51;
   --primary-light: #1A3A63;
-  --accent-blue: #0099CC;
+  --accent-blue: #3B82F6;
 
   /* Status Colors */
-  --color-done: #36A734;
+  --color-done: #369B31;
   --color-visited: #F59E0B;
   --color-todo: #E03C39;
   --color-info: #3B82F6;
 
-  /* Light variants */
-  --color-done-light: #D4EDDA;
-  --color-visited-light: #FFF3CD;
-  --color-todo-light: #F8D7DA;
-  --color-info-light: #D1ECF1;
+  /* Light variants (for badges, backgrounds) */
+  --color-done-light: #DCFCDA;
+  --color-visited-light: #FEF3C7;
+  --color-todo-light: #FBE6E6;
+  --color-info-light: #DBEAFE;
 
-  /* Dark variants */
-  --color-done-dark: #1E7B1D;
+  /* Dark variants (for text on light backgrounds) */
+  --color-done-dark: #15803D;
   --color-visited-dark: #B45309;
-  --color-todo-dark: #A31C19;
+  --color-todo-dark: #B91C1C;
   --color-info-dark: #1D4ED8;
 
-  /* Backgrounds */
-  --bg-page: #0F1419;
-  --bg-sidebar: #151B27;
-  --bg-card: #1A1F2E;
-  --bg-light: #2D3748;
-  --bg-input: #3A4557;
-  --bg-hover: rgba(0, 153, 204, 0.1);
-  --bg-active: rgba(0, 153, 204, 0.15);
+  /* Backgrounds - Light Theme */
+  --bg-page: #0B2B51;
+  --bg-sidebar: #0B2B51;
+  --bg-card: #FFFFFF;
+  --bg-light: #F8FAFC;
+  --bg-gray: #F1F5F9;
+  --bg-input: #FFFFFF;
+  --bg-hover: rgba(11, 43, 81, 0.04);
+  --bg-active: rgba(11, 43, 81, 0.08);
 
   /* Borders */
-  --border-color: #3A4557;
-  --border-light: #4A5568;
+  --border-color: #E4E7EC;
+  --border-light: #F1F3F5;
   --border-focus: var(--accent-blue);
 
-  /* Text */
-  --text-primary: #FFFFFF;
-  --text-secondary: #A0AEC0;
-  --text-muted: #718096;
+  /* Text - Dark text on light backgrounds */
+  --text-primary: #101828;
+  --text-secondary: #475467;
+  --text-muted: #98A2B3;
   --text-link: var(--accent-blue);
 
+  /* White text for dark backgrounds (sidebar, hero) */
+  --text-on-dark: #FFFFFF;
+  --text-on-dark-secondary: rgba(255, 255, 255, 0.8);
+
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
 
   /* Transitions */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
 
-  /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  /* Border Radius - Slightly more rounded for modern feel */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
   --radius-xl: 12px;
 
   /* Spacing */
@@ -76,9 +83,9 @@
 
 /* Chart.js color overrides */
 :root {
-  --chart-done: #36A734;
+  --chart-done: #369B31;
   --chart-visited: #F59E0B;
   --chart-todo: #E03C39;
   --chart-info: #3B82F6;
-  --chart-grid: rgba(74, 85, 104, 0.3);
+  --chart-grid: rgba(228, 231, 236, 0.5);
 }

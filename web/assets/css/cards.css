@@ -12,8 +12,8 @@
 }
 
 .kpi-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--border-light);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--border-color);
   transform: translateY(-2px);
 }
 
@@ -58,30 +58,39 @@
 }
 
 .kpi-icon {
-  font-size: 24px;
+  font-size: 18px;
   width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-light);
-  border-radius: var(--radius-md);
+  background-color: var(--bg-gray);
+  border-radius: var(--radius-lg);
 }
 
 .kpi-card.done .kpi-icon {
-  background-color: rgba(54, 167, 52, 0.15);
+  background-color: var(--color-done-light);
+  color: var(--color-done);
 }
 
 .kpi-card.visited .kpi-icon {
-  background-color: rgba(245, 158, 11, 0.15);
+  background-color: var(--color-visited-light);
+  color: var(--color-visited);
 }
 
 .kpi-card.todo .kpi-icon {
-  background-color: rgba(224, 60, 57, 0.15);
+  background-color: var(--color-todo-light);
+  color: var(--color-todo);
 }
 
 .kpi-card.info .kpi-icon {
-  background-color: rgba(59, 130, 246, 0.15);
+  background-color: var(--color-info-light);
+  color: var(--color-info);
+}
+
+.kpi-card.primary .kpi-icon {
+  background-color: rgba(11, 43, 81, 0.1);
+  color: var(--primary-dark);
 }
 
 .kpi-trend {

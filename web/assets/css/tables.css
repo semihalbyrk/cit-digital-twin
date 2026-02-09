@@ -43,7 +43,7 @@ th.sortable {
 
 th.sortable:hover {
   color: var(--text-primary);
-  background-color: rgba(0, 153, 204, 0.05);
+  background-color: var(--bg-gray);
 }
 
 th.sorted {
