@@ -3,7 +3,6 @@
   <div class="route-header mb-20">
     <div class="route-header-top">
       <button class="btn-back" onclick="navigateToPage('home')">&#8592; Back to Home</button>
-      <button class="btn-primary btn-sm" onclick="navigateToPage('removing-visited', {route: window.currentRouteId})">&#9881; What-If Analysis</button>
     </div>
   </div>
 
@@ -19,253 +18,253 @@
 
   <!-- TAB 1: Parameters & Outputs (single column) -->
   <div class="tab-content active" id="tab-params-outputs">
-    <!-- Parameters -->
-    <div class="card parameter-card">
-      <h2>Simulation Parameters</h2>
-      <p class="text-sm text-muted mb-20">Adjust parameters and run a simulation to see the impact.</p>
+    <div class="route-whatif-layout">
+      <!-- Parameters -->
+      <div class="card parameter-card compact-parameter-card">
+        <h2>Simulation Parameters</h2>
+        <p class="text-sm text-muted mb-20">Adjust parameters and run a simulation to see the impact.</p>
 
-      <!-- Section 1: Time & Traffic -->
-      <div class="param-section collapsible open" data-section="time-traffic">
-        <div class="param-section-header" onclick="toggleParamSection('time-traffic')">
-          <span class="section-icon">&#9201;</span>
-          <span class="section-title">Time & Traffic</span>
-          <span class="collapse-arrow">&#9660;</span>
-        </div>
-        <div class="param-section-body">
-          <div class="parameter-group">
-            <div class="parameter-header">
-              <span class="parameter-label">Start Time</span>
-            </div>
-            <div class="input-simple">
-              <input type="time" id="start-time" value="09:00">
-            </div>
+        <!-- Section 1: Time & Traffic -->
+        <div class="param-section collapsible" data-section="time-traffic">
+          <div class="param-section-header" onclick="toggleParamSection('time-traffic')">
+            <span class="section-icon">&#9201;</span>
+            <span class="section-title">Time & Traffic</span>
+            <span class="collapse-arrow">&#9660;</span>
           </div>
-          <div class="parameter-group">
-            <div class="parameter-header">
-              <span class="parameter-label">End Time</span>
-            </div>
-            <div class="input-simple">
-              <input type="time" id="end-time" value="17:00">
-            </div>
-          </div>
-          <div class="parameter-group">
-            <div class="parameter-header">
-              <span class="parameter-label">Average Speed</span>
-            </div>
-            <div class="input-with-buttons">
-              <div class="input-buttons"><button onclick="adjustParameter('speed', -1)">-</button></div>
-              <div class="input-with-unit">
-                <input type="number" id="speed" value="35" min="10" max="80" step="1">
-                <span class="input-unit">km/h</span>
+          <div class="param-section-body">
+            <div class="parameter-group">
+              <div class="parameter-header">
+                <span class="parameter-label">Start Time</span>
               </div>
-              <div class="input-buttons"><button onclick="adjustParameter('speed', 1)">+</button></div>
-            </div>
-          </div>
-          <div class="parameter-group">
-            <div class="parameter-header">
-              <span class="parameter-label">Break Duration</span>
-            </div>
-            <div class="input-with-buttons">
-              <div class="input-buttons"><button onclick="adjustParameter('break-duration', -15)">-</button></div>
-              <div class="input-with-unit">
-                <input type="number" id="break-duration" value="60" min="0" max="120" step="15">
-                <span class="input-unit">min</span>
+              <div class="input-simple">
+                <input type="time" id="start-time" value="09:00">
               </div>
-              <div class="input-buttons"><button onclick="adjustParameter('break-duration', 15)">+</button></div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section 2: Costs -->
-      <div class="param-section collapsible" data-section="costs">
-        <div class="param-section-header" onclick="toggleParamSection('costs')">
-          <span class="section-icon">$</span>
-          <span class="section-title">Cost Parameters</span>
-          <span class="collapse-arrow">&#9660;</span>
-        </div>
-        <div class="param-section-body">
-          <div class="parameter-group">
-            <div class="parameter-header"><span class="parameter-label">Fuel Consumption</span></div>
-            <div class="input-with-buttons">
-              <div class="input-buttons"><button onclick="adjustParameter('fuel-consumption', -0.5)">-</button></div>
-              <div class="input-with-unit">
-                <input type="number" id="fuel-consumption" value="6.0" min="2" max="15" step="0.5">
-                <span class="input-unit">km/L</span>
+            <div class="parameter-group">
+              <div class="parameter-header">
+                <span class="parameter-label">End Time</span>
               </div>
-              <div class="input-buttons"><button onclick="adjustParameter('fuel-consumption', 0.5)">+</button></div>
+              <div class="input-simple">
+                <input type="time" id="end-time" value="17:00">
+              </div>
             </div>
-          </div>
-          <div class="parameter-group">
-            <div class="parameter-header"><span class="parameter-label">Fuel Price</span></div>
-            <div class="input-with-buttons">
-              <div class="input-buttons"><button onclick="adjustParameter('fuel-price', -0.1)">-</button></div>
-              <div class="input-with-unit">
-                <input type="number" id="fuel-price" value="1.50" min="0.5" max="5" step="0.1">
-                <span class="input-unit">$/L</span>
+            <div class="parameter-group">
+              <div class="parameter-header">
+                <span class="parameter-label">Average Speed</span>
               </div>
-              <div class="input-buttons"><button onclick="adjustParameter('fuel-price', 0.1)">+</button></div>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('speed', -1)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="speed" value="35" min="10" max="80" step="1">
+                  <span class="input-unit">km/h</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('speed', 1)">+</button></div>
+              </div>
             </div>
-          </div>
-          <div class="parameter-group">
-            <div class="parameter-header"><span class="parameter-label">Labor Rate</span></div>
-            <div class="input-with-buttons">
-              <div class="input-buttons"><button onclick="adjustParameter('labor-rate', -1)">-</button></div>
-              <div class="input-with-unit">
-                <input type="number" id="labor-rate" value="25" min="5" max="100" step="1">
-                <span class="input-unit">$/hr</span>
+            <div class="parameter-group">
+              <div class="parameter-header">
+                <span class="parameter-label">Break Duration</span>
               </div>
-              <div class="input-buttons"><button onclick="adjustParameter('labor-rate', 1)">+</button></div>
-            </div>
-          </div>
-          <div class="parameter-group">
-            <div class="parameter-header"><span class="parameter-label">Disposal Cost</span></div>
-            <div class="input-with-buttons">
-              <div class="input-buttons"><button onclick="adjustParameter('disposal-cost', -1)">-</button></div>
-              <div class="input-with-unit">
-                <input type="number" id="disposal-cost" value="15" min="0" max="100" step="1">
-                <span class="input-unit">$/trip</span>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('break-duration', -15)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="break-duration" value="60" min="0" max="120" step="15">
+                  <span class="input-unit">min</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('break-duration', 15)">+</button></div>
               </div>
-              <div class="input-buttons"><button onclick="adjustParameter('disposal-cost', 1)">+</button></div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Section 3: Service Time & Vehicle -->
-      <div class="param-section collapsible" data-section="service-vehicle">
-        <div class="param-section-header" onclick="toggleParamSection('service-vehicle')">
-          <span class="section-icon">&#9881;</span>
-          <span class="section-title">Service Time & Vehicle</span>
-          <span class="collapse-arrow">&#9660;</span>
-        </div>
-        <div class="param-section-body">
-          <div class="parameter-group">
-            <div class="parameter-header"><span class="parameter-label">Default Service Time per Task</span></div>
-            <div class="input-with-buttons">
-              <div class="input-buttons"><button onclick="adjustParameter('service-time', -0.5)">-</button></div>
-              <div class="input-with-unit">
-                <input type="number" id="service-time" value="2.5" min="0.5" max="10" step="0.5">
-                <span class="input-unit">min</span>
-              </div>
-              <div class="input-buttons"><button onclick="adjustParameter('service-time', 0.5)">+</button></div>
-            </div>
+        <!-- Section 2: Costs -->
+        <div class="param-section collapsible" data-section="costs">
+          <div class="param-section-header" onclick="toggleParamSection('costs')">
+            <span class="section-icon">$</span>
+            <span class="section-title">Cost Parameters</span>
+            <span class="collapse-arrow">&#9660;</span>
           </div>
-          <div class="parameter-group">
-            <div class="parameter-header"><span class="parameter-label">Vehicle Capacity</span></div>
-            <div class="input-with-buttons">
-              <div class="input-buttons"><button onclick="adjustParameter('capacity', -1000)">-</button></div>
-              <div class="input-with-unit">
-                <input type="number" id="capacity" value="20000" min="1000" max="30000" step="1000">
-                <span class="input-unit">kg</span>
+          <div class="param-section-body">
+            <div class="parameter-group">
+              <div class="parameter-header"><span class="parameter-label">Fuel Consumption</span></div>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('fuel-consumption', -0.5)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="fuel-consumption" value="6.0" min="2" max="15" step="0.5">
+                  <span class="input-unit">km/L</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('fuel-consumption', 0.5)">+</button></div>
               </div>
-              <div class="input-buttons"><button onclick="adjustParameter('capacity', 1000)">+</button></div>
             </div>
-          </div>
-          <div class="parameter-group">
-            <div class="parameter-header"><span class="parameter-label">1100L Container Weight</span></div>
-            <div class="input-with-buttons">
-              <div class="input-buttons"><button onclick="adjustParameter('weight-1100L', -10)">-</button></div>
-              <div class="input-with-unit">
-                <input type="number" id="weight-1100L" value="550" min="100" max="800" step="10">
-                <span class="input-unit">kg</span>
+            <div class="parameter-group">
+              <div class="parameter-header"><span class="parameter-label">Fuel Price</span></div>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('fuel-price', -0.1)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="fuel-price" value="1.50" min="0.5" max="5" step="0.1">
+                  <span class="input-unit">$/L</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('fuel-price', 0.1)">+</button></div>
               </div>
-              <div class="input-buttons"><button onclick="adjustParameter('weight-1100L', 10)">+</button></div>
             </div>
-          </div>
-          <div class="parameter-group">
-            <div class="parameter-header"><span class="parameter-label">240L Container Weight</span></div>
-            <div class="input-with-buttons">
-              <div class="input-buttons"><button onclick="adjustParameter('weight-240L', -5)">-</button></div>
-              <div class="input-with-unit">
-                <input type="number" id="weight-240L" value="120" min="20" max="200" step="5">
-                <span class="input-unit">kg</span>
+            <div class="parameter-group">
+              <div class="parameter-header"><span class="parameter-label">Labor Rate</span></div>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('labor-rate', -1)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="labor-rate" value="25" min="5" max="100" step="1">
+                  <span class="input-unit">$/hr</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('labor-rate', 1)">+</button></div>
               </div>
-              <div class="input-buttons"><button onclick="adjustParameter('weight-240L', 5)">+</button></div>
             </div>
-          </div>
-          <div class="parameter-group">
-            <div class="parameter-header"><span class="parameter-label">Disposal Time</span></div>
-            <div class="input-with-buttons">
-              <div class="input-buttons"><button onclick="adjustParameter('disposal-time', -1)">-</button></div>
-              <div class="input-with-unit">
-                <input type="number" id="disposal-time" value="15" min="5" max="60" step="1">
-                <span class="input-unit">min</span>
+            <div class="parameter-group">
+              <div class="parameter-header"><span class="parameter-label">Disposal Cost</span></div>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('disposal-cost', -1)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="disposal-cost" value="15" min="0" max="100" step="1">
+                  <span class="input-unit">$/trip</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('disposal-cost', 1)">+</button></div>
               </div>
-              <div class="input-buttons"><button onclick="adjustParameter('disposal-time', 1)">+</button></div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Action Buttons -->
-      <div class="form-actions mt-20">
-        <button class="btn-primary btn-large" onclick="runRouteSimulation()">
-          &#9654; RUN SIMULATION
-        </button>
-      </div>
-      <button class="btn-secondary w-100 mt-10" onclick="resetParameters()">
-        &#8635; Reset to Defaults
-      </button>
-      <button class="btn-secondary w-100 mt-10" onclick="navigateToPage('what-if-analysis')">
-        + NEW SCENARIO
-      </button>
-    </div>
-
-    <!-- Output Metrics (below parameters) -->
-    <div class="card mt-20">
-      <div class="output-metrics-header">OUTPUT METRICS</div>
-
-      <!-- Status Distribution -->
-      <div class="status-distribution mb-20">
-        <div class="status-bar">
-          <div class="status-segment done" id="status-done-bar" style="width:0%"></div>
-          <div class="status-segment visited" id="status-visited-bar" style="width:0%"></div>
-          <div class="status-segment todo" id="status-todo-bar" style="width:0%"></div>
+        <!-- Section 3: Service Time & Vehicle -->
+        <div class="param-section collapsible" data-section="service-vehicle">
+          <div class="param-section-header" onclick="toggleParamSection('service-vehicle')">
+            <span class="section-icon">&#9881;</span>
+            <span class="section-title">Service Time & Vehicle</span>
+            <span class="collapse-arrow">&#9660;</span>
+          </div>
+          <div class="param-section-body">
+            <div class="parameter-group">
+              <div class="parameter-header"><span class="parameter-label">Default Service Time per Task</span></div>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('service-time', -0.5)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="service-time" value="2.5" min="0.5" max="10" step="0.5">
+                  <span class="input-unit">min</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('service-time', 0.5)">+</button></div>
+              </div>
+            </div>
+            <div class="parameter-group">
+              <div class="parameter-header"><span class="parameter-label">Vehicle Capacity</span></div>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('capacity', -1000)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="capacity" value="20000" min="1000" max="30000" step="1000">
+                  <span class="input-unit">kg</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('capacity', 1000)">+</button></div>
+              </div>
+            </div>
+            <div class="parameter-group">
+              <div class="parameter-header"><span class="parameter-label">1100L Container Weight</span></div>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('weight-1100L', -10)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="weight-1100L" value="80" min="1" max="800" step="1">
+                  <span class="input-unit">kg</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('weight-1100L', 10)">+</button></div>
+              </div>
+            </div>
+            <div class="parameter-group">
+              <div class="parameter-header"><span class="parameter-label">240L Container Weight</span></div>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('weight-240L', -5)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="weight-240L" value="32" min="1" max="200" step="1">
+                  <span class="input-unit">kg</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('weight-240L', 5)">+</button></div>
+              </div>
+            </div>
+            <div class="parameter-group">
+              <div class="parameter-header"><span class="parameter-label">Disposal Time</span></div>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('disposal-time', -1)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="disposal-time" value="15" min="5" max="60" step="1">
+                  <span class="input-unit">min</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('disposal-time', 1)">+</button></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="status-legend">
-          <span class="status-legend-item done">Done <span id="status-done-pct"></span></span>
-          <span class="status-legend-item visited">Visited <span id="status-visited-pct"></span></span>
-          <span class="status-legend-item todo">To-Do <span id="status-todo-pct"></span></span>
+
+        <!-- Action Buttons -->
+        <div class="form-actions mt-20 route-run-actions">
+          <button class="btn-primary" onclick="runRouteSimulation()">
+            &#9654; RUN SIMULATION
+          </button>
         </div>
       </div>
 
-      <div class="kpi-grid kpi-grid-3x3" id="route-kpi-grid">
-        <!-- Populated by JavaScript: 9 KPI cards -->
-      </div>
-    </div>
+      <!-- Output Metrics + Breakdown -->
+      <div class="route-output-split">
+        <div class="card route-kpis-card">
+          <div class="output-metrics-header">OUTPUT METRICS</div>
 
-    <!-- Detailed Breakdowns -->
-    <div class="card mt-20" id="simulation-results">
-      <h3 style="margin-bottom:16px;">Detailed Breakdown</h3>
+          <!-- Status Distribution -->
+          <div class="status-distribution mb-20">
+            <div class="status-bar">
+              <div class="status-segment done" id="status-done-bar" style="width:0%"></div>
+              <div class="status-segment visited" id="status-visited-bar" style="width:0%"></div>
+              <div class="status-segment todo" id="status-todo-bar" style="width:0%"></div>
+            </div>
+            <div class="status-legend">
+              <span class="status-legend-item done">Done <span id="status-done-pct"></span></span>
+              <span class="status-legend-item visited">Visited <span id="status-visited-pct"></span></span>
+              <span class="status-legend-item todo">To-Do <span id="status-todo-pct"></span></span>
+            </div>
+          </div>
 
-      <div class="breakdown-section">
-        <h4>Operational Metrics</h4>
-        <ul class="breakdown-list">
-          <li><span>Travel Time</span> <strong id="out-travel-time">--</strong></li>
-          <li><span>Service Time</span> <strong id="out-service-time">--</strong></li>
-          <li><span>Total Time</span> <strong id="out-total-time">--</strong></li>
-          <li><span>Distance</span> <strong id="out-distance">--</strong></li>
-        </ul>
-      </div>
+          <div class="kpi-grid route-kpi-grid-compact" id="route-kpi-grid">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
 
-      <div class="breakdown-section">
-        <h4>Financial Breakdown</h4>
-        <ul class="breakdown-list">
-          <li><span>Fuel Cost</span> <strong id="out-fuel-cost">--</strong></li>
-          <li><span>Labor Cost</span> <strong id="out-labor-cost">--</strong></li>
-          <li><span>Disposal</span> <strong>$15.00</strong></li>
-          <li><span>Total Cost</span> <strong id="out-total-cost" style="color:var(--color-done)">--</strong></li>
-        </ul>
-      </div>
+        <div class="card route-breakdown-card" id="simulation-results">
+          <h3>Detailed Breakdown</h3>
 
-      <div class="breakdown-section">
-        <h4>Environmental Impact</h4>
-        <ul class="breakdown-list">
-          <li><span>Fuel Used</span> <strong id="out-fuel-used">--</strong></li>
-          <li><span>CO2 Emissions</span> <strong id="out-co2">--</strong></li>
-          <li><span>Utilization</span> <strong id="out-utilization">--</strong></li>
-        </ul>
+          <div class="breakdown-section">
+            <h4>Operational Metrics</h4>
+            <ul class="breakdown-list">
+              <li><span>Travel Time</span> <strong id="out-travel-time">--</strong></li>
+              <li><span>Service Time</span> <strong id="out-service-time">--</strong></li>
+              <li><span>Total Time (Including breaks)</span> <strong id="out-total-time">--</strong></li>
+              <li><span>Distance</span> <strong id="out-distance">--</strong></li>
+              <li><span>Collected Waste</span> <strong id="out-waste">--</strong></li>
+            </ul>
+          </div>
+
+          <div class="breakdown-section">
+            <h4>Financial Breakdown</h4>
+            <ul class="breakdown-list">
+              <li><span>Fuel Cost</span> <strong id="out-fuel-cost">--</strong></li>
+              <li><span>Labor Cost</span> <strong id="out-labor-cost">--</strong></li>
+              <li><span>Disposal</span> <strong>$15.00</strong></li>
+              <li><span>Total Cost</span> <strong id="out-total-cost" style="color:var(--color-done)">--</strong></li>
+            </ul>
+          </div>
+
+          <div class="breakdown-section">
+            <h4>Environmental Impact</h4>
+            <ul class="breakdown-list">
+              <li><span>Fuel Used</span> <strong id="out-fuel-used">--</strong></li>
+              <li><span>CO2 Emissions</span> <strong id="out-co2">--</strong></li>
+              <li><span>Vehicle Utilization</span> <strong id="out-utilization">--</strong></li>
+              <li><span>Waste per km</span> <strong id="out-waste-per-km">--</strong></li>
+              <li><span>Waste per hr</span> <strong id="out-waste-per-hr">--</strong></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>

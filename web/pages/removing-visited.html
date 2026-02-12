@@ -8,31 +8,21 @@
     <span>Removing Visited Tasks</span>
   </div>
 
+  <div class="card base-route-card mb-20">
+    <div class="base-route-controls">
+      <div class="form-group mb-0">
+        <label for="base-route-select">Base Route</label>
+        <select id="base-route-select">
+          <!-- Populated by JavaScript -->
+        </select>
+      </div>
+    </div>
+  </div>
+
   <!-- Two-column layout -->
-  <div class="two-column-grid">
+  <div class="removing-visited-layout">
     <!-- Left: Task Selection -->
     <div class="left-panel">
-      <!-- Scenario Setup -->
-      <div class="card">
-        <div class="card-header">
-          <h2>Scenario Configuration</h2>
-        </div>
-        <div class="form-group">
-          <label>Scenario Name</label>
-          <input type="text" id="scenario-name" value="Remove Visited Tasks" placeholder="Enter scenario name">
-        </div>
-        <div class="form-group">
-          <label>Description (optional)</label>
-          <textarea id="scenario-description" rows="2" placeholder="Brief description of this scenario..." style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:var(--radius-md);font-size:13px;resize:vertical;font-family:inherit;"></textarea>
-        </div>
-        <div class="form-group">
-          <label>Base Route</label>
-          <select id="base-route-select">
-            <!-- Populated by JavaScript -->
-          </select>
-        </div>
-      </div>
-
       <!-- Visited Tasks Table -->
       <div class="card">
         <div class="card-header">
@@ -72,11 +62,11 @@
       </div>
     </div>
 
-    <!-- Right: Impact Preview -->
+    <!-- Right: Impact Review -->
     <div class="right-panel">
       <div class="card">
         <div class="card-header">
-          <h2>Impact Preview</h2>
+          <h2>Impact Review</h2>
         </div>
         <p class="text-sm text-muted mb-20">See the estimated impact of removing selected tasks.</p>
 
@@ -172,9 +162,29 @@
             &#128190; SAVE SCENARIO
           </button>
         </div>
-        <button class="btn-secondary w-100 mt-10" onclick="navigateToPage('compare-scenarios')">
-          &#9879; Compare with Baseline
-        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="save-scenario-modal" class="modal-overlay hidden" onclick="if(event.target === this) closeSaveScenarioModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Save Scenario</h3>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="modal-scenario-name">Scenario Name</label>
+          <input type="text" id="modal-scenario-name" placeholder="Enter scenario name">
+        </div>
+        <div class="form-group">
+          <label for="modal-scenario-description">Description (optional)</label>
+          <textarea id="modal-scenario-description" rows="3" placeholder="Add a short description"></textarea>
+        </div>
+        <div id="save-scenario-error" class="text-todo text-sm"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeSaveScenarioModal()">Cancel</button>
+        <button class="btn-primary" onclick="confirmSaveScenario()">Save Scenario</button>
       </div>
     </div>
   </div>

@@ -171,7 +171,7 @@
   --primary-glow: rgba(59, 169, 53, 0.15);
 
   /* Dark background (sidebar, banners) */
-  --primary-dark: #0b2b51;
+  --primary-dark: rgb(11, 43, 81);
 
   /* Accent blue (links, focus, info) */
   --accent-blue: #3B82F6;
@@ -196,7 +196,7 @@
 
   /* ─── Backgrounds ──────────────────────────────────────────────────────── */
   --bg-page: #f5f7fa;
-  --bg-sidebar: #0b2b51;
+  --bg-sidebar: rgb(11, 43, 81);
   --bg-card: #ffffff;
   --bg-light: #f5f7fa;
   --bg-gray: #f5f7fa;

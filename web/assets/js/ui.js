@@ -8,10 +8,11 @@ const UI = {
     const sidebar = document.getElementById('sidebar');
     sidebar.innerHTML = `
       <div class="sidebar-logo">
-        <div class="sidebar-logo-icon">DT</div>
+        <div class="sidebar-logo-icon-chip">
+          <img class="sidebar-logo-icon" src="/components/evreka-icon.png" alt="Evreka logo">
+        </div>
         <div class="sidebar-logo-text">
           <div class="sidebar-logo-title">CIT Digital Twin</div>
-          <div class="sidebar-logo-subtitle">Route Optimization</div>
         </div>
       </div>
 
@@ -93,6 +94,9 @@ const UI = {
   // Render header
   renderHeader(title, subtitle = '', options = {}) {
     const header = document.getElementById('header');
+    header.style.display = 'flex';
+    header.className = options.compact ? 'header header-compact' : 'header';
+    const showDateFilter = options.showDateFilter !== false;
     header.innerHTML = `
       <div class="header-left">
         <button class="mobile-menu-btn" onclick="UI.toggleMobileSidebar()">
@@ -103,7 +107,7 @@ const UI = {
       </div>
       <div class="header-right">
         ${options.rightHtml || ''}
-        <span class="header-date-filter">05.01 - 11.01.2026</span>
+        ${showDateFilter ? '<span class="header-date-filter">05.01 - 11.01.2026</span>' : ''}
       </div>
     `;
   },
@@ -145,7 +149,7 @@ const UI = {
     if (!container) return;
 
     container.innerHTML = kpis.map(kpi => `
-      <div class="kpi-card ${kpi.status || ''} ${kpi.clickable ? 'clickable' : ''}"
+      <div class="kpi-card ${kpi.status || ''} ${kpi.clickable ? 'clickable' : ''} ${kpi.compact ? 'compact' : ''}"
            ${kpi.onclick ? `onclick="${kpi.onclick}"` : ''}>
         <div class="kpi-header">
           <div class="kpi-icon">${kpi.icon || ''}</div>
@@ -263,6 +267,41 @@ function switchTab(tabId) {
   if (tabId === 'route-details' && !window._routeDetailsLoaded) {
     loadRouteDetailsTab();
   }
+}
+
+function getRouteCapacityKg(route, fallbackKg = 20000) {
+  const rawCapacity = Number(route?.capacity);
+  if (!Number.isFinite(rawCapacity) || rawCapacity <= 0) return fallbackKg;
+  // Dataset capacity is in tons for some routes (e.g. 20), normalize to kg.
+  return rawCapacity <= 100 ? rawCapacity * 1000 : rawCapacity;
+}
+
+function getCollectedWasteKg(route, options = {}) {
+  const weight1100 = Number(options.weight1100 || 80);
+  const weight240 = Number(options.weight240 || 32);
+
+  if (Array.isArray(route?.service_points) && route.service_points.length) {
+    const total = route.service_points.reduce((sum, sp) => {
+      if ((sp?.status || '').toLowerCase() !== 'done') return sum;
+      const explicitWeight = Number(sp?.weight_kg);
+      if (Number.isFinite(explicitWeight) && explicitWeight >= 0) return sum + explicitWeight;
+
+      const type = String(sp?.container_type || '').toLowerCase();
+      if (type.includes('240')) return sum + weight240;
+      if (type.includes('1100')) return sum + weight1100;
+      return sum + weight1100;
+    }, 0);
+    if (total > 0) return total;
+  }
+
+  const doneTasks = Number(route?.tasks_done || 0);
+  return doneTasks * weight1100;
+}
+
+function formatRatioMetric(value, unit) {
+  if (!Number.isFinite(value)) return '--';
+  if (value >= 1000) return `${formatNumber(value)} ${unit}`;
+  return `${formatDecimal(value, 1)} ${unit}`;
 }
 
 // Load route details tab data from CSV endpoint
@@ -387,7 +426,8 @@ function renderCompletedSequencePage(page, pageSize = 20) {
 // Page Controllers - initialization logic for each page
 const PageControllers = {
   'route-plan-selection': async () => {
-    UI.renderHeader('CIT Digital Twin', 'Route Plan Selection');
+    const header = document.getElementById('header');
+    if (header) header.style.display = 'none';
     // Hide sidebar on selection page
     const sidebar = document.getElementById('sidebar');
     if (sidebar) sidebar.style.display = 'none';
@@ -395,8 +435,8 @@ const PageControllers = {
 
   'home': async () => {
     ensureSidebarVisible();
-    UI.renderHeader('Zone 2 B (Day)', 'Albada Zone-2 | Week of Jan 6-11, 2026', {
-      rightHtml: '<button class="btn-secondary" onclick="navigateToPage(\'route-plan-selection\')">CHANGE ROUTE</button>'
+    UI.renderHeader('Zone 2 B (Day)', 'Albada Zone-2 | Week of Jan 5-11, 2026', {
+      rightHtml: '<button class="btn-secondary" onclick="navigateToPage(\'route-plan-selection\')">Change Route Plan</button>'
     });
 
     // Get Zone 2 B routes
@@ -519,7 +559,7 @@ const PageControllers = {
     }
 
     // Render header
-    UI.renderHeader('V0 Baseline Overview', 'Week of Jan 6-11, 2026 | All 33 Routes | 5 Days');
+    UI.renderHeader('V0 Baseline Overview', 'Week of Jan 5-11, 2026 | All 33 Routes | 5 Days');
 
     // Render KPI cards
     UI.renderKPICards('kpi-grid-overview', [
@@ -617,22 +657,37 @@ const PageControllers = {
     // Update header with correct date format
     const totalTasks = route.tasks_done + route.tasks_visited + route.tasks_todo;
     const dateDisplay = route.date ? formatDateFull(route.date) : route.day;
-    UI.renderHeader(route.route_name, `${dateDisplay} | Vehicle: ${route.vehicle_id} | ${totalTasks} tasks`);
+    UI.renderHeader(route.route_name, `${dateDisplay} | Vehicle: ${route.vehicle_id} | ${totalTasks} tasks`, {
+      compact: true,
+      showDateFilter: false,
+      rightHtml: '<button class="btn-primary btn-sm btn-whatif-cta" onclick="navigateToPage(\'removing-visited\', {route: window.currentRouteId})">&#9881; Do What-If Analysis</button>'
+    });
 
-    // Render 9 KPI cards (3x3 grid)
-    const utilization = (route.tasks_done * 550) / 20000;
-    const fuelUsed = route.total_distance_km / 6.0;
-    const co2 = fuelUsed * 2.31;
+    const distanceKm = route.total_distance_km || 0;
+    const totalTimeMin = route.total_time_minutes || 0;
+    const totalTimeHours = totalTimeMin > 0 ? totalTimeMin / 60 : 0;
+    const fuelUsed = distanceKm / 6.0;
+    const co2 = route.co2_emissions_kg || (fuelUsed * 2.31);
+    const vehicleCapacityKg = getRouteCapacityKg(route);
+    const collectedWasteKg = getCollectedWasteKg(route);
+    const utilizationPercent = vehicleCapacityKg > 0 ? (collectedWasteKg / vehicleCapacityKg) * 100 : null;
+    const wastePerKm = distanceKm > 0 ? (collectedWasteKg / distanceKm) : null;
+    const wastePerHr = totalTimeHours > 0 ? (collectedWasteKg / totalTimeHours) : null;
+    const doneShare = totalTasks > 0 ? route.tasks_done / totalTasks : 0;
+
+    // Render compact KPI cards
     UI.renderKPICards('route-kpi-grid', [
-      { icon: '&#10003;', label: 'Done', value: formatNumber(route.tasks_done), subtext: `${formatPercentage(route.tasks_done / totalTasks)} of total`, status: 'done' },
-      { icon: '&#9673;', label: 'Visited', value: formatNumber(route.tasks_visited), subtext: 'Failed attempts', status: 'visited' },
-      { icon: '&#9744;', label: 'To-Do', value: formatNumber(route.tasks_todo), subtext: 'Not attempted', status: 'todo' },
-      { icon: '&#9672;', label: 'Distance', value: formatDistance(route.total_distance_km), subtext: 'Total route', status: 'info' },
-      { icon: '&#9201;', label: 'Time', value: formatTime(route.total_time_minutes), subtext: 'Including breaks', status: 'info' },
-      { icon: '$', label: 'Cost', value: formatCurrency(route.total_cost), subtext: 'All inclusive', status: 'info' },
-      { icon: '&#9889;', label: 'Utilization', value: formatPercentage(Math.min(utilization, 1)), subtext: 'Vehicle capacity', status: utilization >= 0.7 ? 'done' : 'visited' },
-      { icon: '&#128203;', label: 'Waste', value: `${Math.round(route.tasks_done * 550 * 0.5)} kg`, subtext: 'Estimated collected', status: 'info' },
-      { icon: '&#9729;', label: 'CO2', value: formatCO2(route.co2_emissions_kg || co2), subtext: 'Emissions', status: 'info' }
+      { icon: '&#10003;', label: 'Done', value: formatNumber(route.tasks_done), subtext: `${formatPercentage(doneShare)} of total`, status: 'done', compact: true },
+      { icon: '&#9673;', label: 'Visited', value: formatNumber(route.tasks_visited), subtext: 'Failed attempts', status: 'visited', compact: true },
+      { icon: '&#9744;', label: 'To-Do', value: formatNumber(route.tasks_todo), subtext: 'Not attempted', status: 'todo', compact: true },
+      { icon: '&#9672;', label: 'Distance', value: formatDistance(distanceKm), subtext: 'Total route', status: 'info', compact: true },
+      { icon: '&#9201;', label: 'Time', value: formatTime(totalTimeMin), subtext: 'Including breaks', status: 'info', compact: true },
+      { icon: '$', label: 'Cost', value: formatCurrency(route.total_cost || 0), subtext: 'All inclusive', status: 'info', compact: true },
+      { icon: '&#128203;', label: 'Waste', value: `${formatNumber(collectedWasteKg)} kg`, subtext: 'Collected waste', status: 'info', compact: true },
+      { icon: '&#9889;', label: 'Vehicle Utilization', value: utilizationPercent === null ? '--' : `${formatDecimal(utilizationPercent, 1)}%`, subtext: `Capacity ${formatNumber(vehicleCapacityKg)} kg`, status: utilizationPercent !== null && utilizationPercent >= 70 ? 'done' : 'visited', compact: true },
+      { icon: '&#128668;', label: 'Waste per km', value: formatRatioMetric(wastePerKm, 'kg/km'), subtext: 'Collected / distance', status: 'info', compact: true },
+      { icon: '&#9203;', label: 'Waste per hr', value: formatRatioMetric(wastePerHr, 'kg/hr'), subtext: 'Collected / total time', status: 'info', compact: true },
+      { icon: '&#9729;', label: 'CO2', value: formatCO2(co2), subtext: 'Emissions', status: 'info', compact: true }
     ]);
 
     // Render status distribution bar
@@ -658,18 +713,21 @@ const PageControllers = {
     }
 
     // Populate initial breakdown values from route data
-    const travelTime = route.total_travel_time_minutes || (route.total_time_minutes * 0.3);
-    const serviceTime = route.total_service_time_minutes || (route.total_time_minutes * 0.6);
+    const travelTime = route.total_travel_time_minutes || (totalTimeMin * 0.3);
+    const serviceTime = route.total_service_time_minutes || (totalTimeMin * 0.6);
     setText('out-travel-time', formatTime(travelTime));
     setText('out-service-time', formatTime(serviceTime));
-    setText('out-total-time', formatTime(route.total_time_minutes));
-    setText('out-distance', formatDistance(route.total_distance_km));
+    setText('out-total-time', formatTime(totalTimeMin));
+    setText('out-distance', formatDistance(distanceKm));
+    setText('out-waste', `${formatNumber(collectedWasteKg)} kg`);
     setText('out-fuel-cost', formatCurrency(route.fuel_cost || fuelUsed * 1.5));
-    setText('out-labor-cost', formatCurrency(route.labor_cost || (route.total_time_minutes / 60) * 25));
-    setText('out-total-cost', formatCurrency(route.total_cost));
+    setText('out-labor-cost', formatCurrency(route.labor_cost || (totalTimeMin / 60) * 25));
+    setText('out-total-cost', formatCurrency(route.total_cost || 0));
     setText('out-fuel-used', `${fuelUsed.toFixed(1)} L`);
-    setText('out-co2', formatCO2(route.co2_emissions_kg || co2));
-    setText('out-utilization', formatPercentage(Math.min(utilization, 1)));
+    setText('out-co2', formatCO2(co2));
+    setText('out-utilization', utilizationPercent === null ? '--' : `${formatDecimal(utilizationPercent, 1)}%`);
+    setText('out-waste-per-km', formatRatioMetric(wastePerKm, 'kg/km'));
+    setText('out-waste-per-hr', formatRatioMetric(wastePerHr, 'kg/hr'));
   },
 
   'removing-visited': async () => {
@@ -1293,16 +1351,12 @@ function resetParameters() {
   const weight240L = document.getElementById('weight-240L');
 
   if (capacity) capacity.value = 20000;
-  if (weight1100L) weight1100L.value = 550;
-  if (weight240L) weight240L.value = 120;
+  if (weight1100L) weight1100L.value = 80;
+  if (weight240L) weight240L.value = 32;
 
   // Disposal
   const disposalTime = document.getElementById('disposal-time');
   if (disposalTime) disposalTime.value = 15;
-
-  // Hide simulation results
-  const resultsSection = document.getElementById('simulation-results');
-  if (resultsSection) resultsSection.classList.add('hidden');
 
   showNotification('Parameters reset to defaults', 'info');
 }
@@ -1311,7 +1365,7 @@ function resetParameters() {
 async function runRouteSimulation() {
   const routeId = window.currentRouteId;
   if (!routeId) {
-    showNotification('No route selected', 'error');
+    console.error('No route selected');
     return;
   }
 
@@ -1328,45 +1382,61 @@ async function runRouteSimulation() {
     labor_rate: parseFloat(document.getElementById('labor-rate')?.value || 25),
     disposal_cost: parseFloat(document.getElementById('disposal-cost')?.value || 15),
     disposal_time: parseFloat(document.getElementById('disposal-time')?.value || 15),
-    weight_1100L: parseFloat(document.getElementById('weight-1100L')?.value || 550),
-    weight_240L: parseFloat(document.getElementById('weight-240L')?.value || 120)
+    weight_1100L: parseFloat(document.getElementById('weight-1100L')?.value || 80),
+    weight_240L: parseFloat(document.getElementById('weight-240L')?.value || 32)
   };
-
-  showNotification('Running simulation...', 'info');
 
   try {
     const result = await API.runSimulation(routeId, parameters);
-    showNotification('Simulation completed!', 'success');
 
     if (result) {
-      // Update KPIs with result
-      const totalTasks = result.done + result.visited + result.todo;
+      const route = getRouteById(routeId);
+      const totalTasks = (result.done || 0) + (result.visited || 0) + (result.todo || 0);
+      const doneShare = totalTasks > 0 ? (result.done || 0) / totalTasks : 0;
+      const capacityKg = Number(result.vehicle_capacity_kg || parameters.capacity);
+      const collectedWasteKg = Number(result.collected_waste_kg) || getCollectedWasteKg(route, {
+        weight1100: parameters.weight_1100L,
+        weight240: parameters.weight_240L
+      });
+      const distanceKm = Number(result.distance || 0);
+      const totalTimeMin = Number(result.total_time || 0);
+      const totalTimeHours = totalTimeMin > 0 ? totalTimeMin / 60 : 0;
+      const utilizationPercent = Number.isFinite(result.utilization_percent)
+        ? Number(result.utilization_percent)
+        : (capacityKg > 0 ? (collectedWasteKg / capacityKg) * 100 : null);
+      const wastePerKm = distanceKm > 0 ? (collectedWasteKg / distanceKm) : null;
+      const wastePerHr = totalTimeHours > 0 ? (collectedWasteKg / totalTimeHours) : null;
+
+      // Update KPIs with result (compact)
       UI.renderKPICards('route-kpi-grid', [
-        { icon: '&#10003;', label: 'Done', value: formatNumber(result.done || 0), subtext: `${formatPercentage(result.done / totalTasks)} of total`, status: 'done' },
-        { icon: '&#9673;', label: 'Visited', value: formatNumber(result.visited || 0), subtext: 'Failed attempts', status: 'visited' },
-        { icon: '&#9744;', label: 'To-Do', value: formatNumber(result.todo || 0), subtext: 'Not attempted', status: 'todo' },
-        { icon: '&#9672;', label: 'Distance', value: formatDistance(result.distance), subtext: 'Total route', status: 'info' },
-        { icon: '&#9201;', label: 'Time', value: formatTime(result.total_time), subtext: 'Including breaks', status: 'info' },
-        { icon: '&#128203;', label: 'Tasks', value: formatNumber(totalTasks), subtext: 'Total planned', status: 'info' },
-        { icon: '$', label: 'Cost', value: formatCurrency(result.total_cost), subtext: 'All inclusive', status: 'info' },
-        { icon: '&#9889;', label: 'Utilization', value: formatPercentage(result.utilization), subtext: 'Vehicle capacity', status: result.utilization >= 0.7 ? 'done' : 'visited' }
+        { icon: '&#10003;', label: 'Done', value: formatNumber(result.done || 0), subtext: `${formatPercentage(doneShare)} of total`, status: 'done', compact: true },
+        { icon: '&#9673;', label: 'Visited', value: formatNumber(result.visited || 0), subtext: 'Failed attempts', status: 'visited', compact: true },
+        { icon: '&#9744;', label: 'To-Do', value: formatNumber(result.todo || 0), subtext: 'Not attempted', status: 'todo', compact: true },
+        { icon: '&#9672;', label: 'Distance', value: formatDistance(distanceKm), subtext: 'Total route', status: 'info', compact: true },
+        { icon: '&#9201;', label: 'Time', value: formatTime(totalTimeMin), subtext: 'Including breaks', status: 'info', compact: true },
+        { icon: '$', label: 'Cost', value: formatCurrency(result.total_cost || 0), subtext: 'All inclusive', status: 'info', compact: true },
+        { icon: '&#128203;', label: 'Waste', value: `${formatNumber(collectedWasteKg)} kg`, subtext: 'Collected waste', status: 'info', compact: true },
+        { icon: '&#9889;', label: 'Vehicle Utilization', value: utilizationPercent === null ? '--' : `${formatDecimal(utilizationPercent, 1)}%`, subtext: `Capacity ${formatNumber(capacityKg)} kg`, status: utilizationPercent !== null && utilizationPercent >= 70 ? 'done' : 'visited', compact: true },
+        { icon: '&#128668;', label: 'Waste per km', value: formatRatioMetric(wastePerKm, 'kg/km'), subtext: 'Collected / distance', status: 'info', compact: true },
+        { icon: '&#9203;', label: 'Waste per hr', value: formatRatioMetric(wastePerHr, 'kg/hr'), subtext: 'Collected / total time', status: 'info', compact: true },
+        { icon: '&#9729;', label: 'CO2', value: formatCO2(result.co2 || 0), subtext: 'Emissions', status: 'info', compact: true }
       ]);
 
-      // Show and update simulation results section
+      // Update simulation results section
       const resultsSection = document.getElementById('simulation-results');
       if (resultsSection) {
-        resultsSection.classList.remove('hidden');
-
         // Operational metrics
         const outTravelTime = document.getElementById('out-travel-time');
         const outServiceTime = document.getElementById('out-service-time');
         const outTotalTime = document.getElementById('out-total-time');
         const outDistance = document.getElementById('out-distance');
+        const outWaste = document.getElementById('out-waste');
 
         if (outTravelTime) outTravelTime.textContent = formatTime(result.travel_time);
         if (outServiceTime) outServiceTime.textContent = formatTime(result.service_time);
-        if (outTotalTime) outTotalTime.textContent = formatTime(result.total_time);
-        if (outDistance) outDistance.textContent = formatDistance(result.distance);
+        if (outTotalTime) outTotalTime.textContent = formatTime(totalTimeMin);
+        if (outDistance) outDistance.textContent = formatDistance(distanceKm);
+        if (outWaste) outWaste.textContent = `${formatNumber(collectedWasteKg)} kg`;
 
         // Financial metrics
         const outFuelCost = document.getElementById('out-fuel-cost');
@@ -1381,14 +1451,18 @@ async function runRouteSimulation() {
         const outFuelUsed = document.getElementById('out-fuel-used');
         const outCo2 = document.getElementById('out-co2');
         const outUtilization = document.getElementById('out-utilization');
+        const outWastePerKm = document.getElementById('out-waste-per-km');
+        const outWastePerHr = document.getElementById('out-waste-per-hr');
 
         if (outFuelUsed) outFuelUsed.textContent = `${result.fuel_used} L`;
         if (outCo2) outCo2.textContent = formatCO2(result.co2);
-        if (outUtilization) outUtilization.textContent = formatPercentage(result.utilization);
+        if (outUtilization) outUtilization.textContent = utilizationPercent === null ? '--' : `${formatDecimal(utilizationPercent, 1)}%`;
+        if (outWastePerKm) outWastePerKm.textContent = formatRatioMetric(wastePerKm, 'kg/km');
+        if (outWastePerHr) outWastePerHr.textContent = formatRatioMetric(wastePerHr, 'kg/hr');
       }
     }
   } catch (error) {
-    showNotification('Simulation failed: ' + error.message, 'error');
+    console.error('Simulation failed:', error);
   }
 }
 
@@ -1661,23 +1735,57 @@ function setDelta(id, value, suffix = '', isCurrency = false) {
 
 // Save scenario
 function saveScenario() {
-  const nameInput = document.getElementById('scenario-name');
+  openSaveScenarioModal();
+}
+
+function openSaveScenarioModal() {
+  const modal = document.getElementById('save-scenario-modal');
+  if (!modal) return;
+
+  const nameInput = document.getElementById('modal-scenario-name');
+  const descInput = document.getElementById('modal-scenario-description');
+  const errorEl = document.getElementById('save-scenario-error');
+
+  if (nameInput && !nameInput.value.trim()) {
+    const route = getRouteById(window.currentRouteId);
+    const dateLabel = route?.date ? new Date(route.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Route';
+    nameInput.value = `Visited Tasks Removal - ${dateLabel}`;
+  }
+  if (descInput && !descInput.value.trim()) {
+    descInput.value = '';
+  }
+  if (errorEl) errorEl.textContent = '';
+
+  modal.classList.remove('hidden');
+  setTimeout(() => nameInput?.focus(), 0);
+}
+
+function closeSaveScenarioModal() {
+  const modal = document.getElementById('save-scenario-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function confirmSaveScenario() {
+  const nameInput = document.getElementById('modal-scenario-name');
+  const descInput = document.getElementById('modal-scenario-description');
+  const errorEl = document.getElementById('save-scenario-error');
   const name = nameInput?.value?.trim();
+
   if (!name) {
-    showNotification('Please enter a scenario name', 'warning');
+    if (errorEl) errorEl.textContent = 'Scenario name is required.';
     nameInput?.focus();
     return;
   }
 
   const checked = document.querySelectorAll('input[name="visited-task-select"]:checked');
   if (checked.length === 0) {
-    showNotification('Please select at least one visited task to remove', 'warning');
+    if (errorEl) errorEl.textContent = 'Select at least one visited task to remove.';
     return;
   }
 
   const selectedTasks = Array.from(checked).map(cb => cb.value);
   const route = getRouteById(window.currentRouteId);
-  const description = document.getElementById('scenario-description')?.value?.trim() || '';
+  const description = descInput?.value?.trim() || '';
 
   // Build baseRoute metadata
   const baseRoute = route ? {
@@ -1713,6 +1821,7 @@ function saveScenario() {
   };
 
   Scenarios.setResults(scenarioId, v1Metrics);
+  closeSaveScenarioModal();
   showNotification(`Scenario "${name}" saved as ${scenarioId.toUpperCase()}!`, 'success');
   UI.updateSidebarStats();
 }

@@ -32,8 +32,16 @@
     grid-template-columns: 1fr;
   }
 
+  .removing-visited-layout {
+    grid-template-columns: 1fr;
+  }
+
   .day-charts-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .route-output-split {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -72,6 +80,10 @@
   }
 
   .two-column-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .removing-visited-layout {
     grid-template-columns: 1fr;
   }
 
@@ -253,6 +265,15 @@
 
   .comparison-vs {
     display: none;
+  }
+
+  .route-kpi-grid-compact {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-whatif-cta {
+    width: 100%;
+    margin-top: 8px;
   }
 }
 

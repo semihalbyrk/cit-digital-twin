@@ -669,6 +669,90 @@ input[type="time"]:focus {
   overflow-y: auto;
 }
 
+.route-detail .parameter-card {
+  max-height: none;
+  overflow: visible;
+}
+
+.route-detail .param-section {
+  margin-bottom: 8px;
+}
+
+.route-detail .param-section-header {
+  padding: 10px 12px;
+  gap: 8px;
+}
+
+.route-detail .param-section-body {
+  padding: 10px 12px;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.route-detail .section-icon {
+  width: 18px;
+  font-size: 14px;
+}
+
+.route-detail .section-title {
+  font-size: 13px;
+}
+
+.route-detail .parameter-group {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) minmax(320px, 480px);
+  column-gap: 16px;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+}
+
+.route-detail .parameter-header {
+  margin-bottom: 0;
+}
+
+.route-detail .parameter-label {
+  font-size: 13px;
+}
+
+.route-detail .input-with-buttons {
+  width: 100%;
+  gap: 8px;
+  display: grid;
+  grid-template-columns: 32px minmax(180px, 1fr) 32px;
+  align-items: center;
+}
+
+.route-detail .input-simple {
+  width: 100%;
+}
+
+.route-detail .input-buttons button {
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+.route-detail .input-with-unit input,
+.route-detail .input-simple input,
+.route-detail input[type="time"] {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+@media (max-width: 767px) {
+  .route-detail .parameter-group {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+
+  .route-detail .input-with-buttons {
+    grid-template-columns: 28px minmax(120px, 1fr) 28px;
+    gap: 6px;
+  }
+}
+
 /* Status Distribution Bar */
 .status-distribution {
   margin-bottom: 20px;
@@ -882,13 +966,13 @@ input[type="time"]:focus {
 }
 
 .impact-section-title {
-  background-color: rgba(18, 164, 237, 0.08);
+  background-color: rgba(11, 43, 81, 0.08);
   padding: 8px 16px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--accent-blue);
+  color: var(--primary-dark);
 }
 
 .impact-row {
@@ -904,7 +988,7 @@ input[type="time"]:focus {
 }
 
 .impact-row.highlight {
-  background-color: rgba(18, 164, 237, 0.05);
+  background-color: rgba(11, 43, 81, 0.05);
 }
 
 .impact-row.highlight .impact-col:not(.metric-col) {
@@ -946,7 +1030,7 @@ input[type="time"]:focus {
 }
 
 .summary-text strong {
-  color: var(--accent-blue);
+  color: var(--primary-dark);
 }
 
 /* Scenario Items */

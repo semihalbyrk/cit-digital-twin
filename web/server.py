@@ -336,6 +336,12 @@ def serve_assets(filename):
     return send_from_directory(str(WEB_DIR / 'assets'), filename)
 
 
+@app.route('/components/<path:filename>')
+def serve_components(filename):
+    """Serve component assets."""
+    return send_from_directory(str(WEB_DIR / 'components'), filename)
+
+
 # ─── API Routes ──────────────────────────────────────────────────────────────
 
 @app.route('/api/baseline/v0')
@@ -564,8 +570,8 @@ def run_simulation():
     disposal_time = parameters.get('disposal_time', 15)  # minutes
 
     # Container weights
-    weight_1100L = parameters.get('weight_1100L', 550)  # kg
-    weight_240L = parameters.get('weight_240L', 120)  # kg
+    weight_1100L = parameters.get('weight_1100L', 80)  # kg
+    weight_240L = parameters.get('weight_240L', 32)  # kg
 
     # Base values from route
     base_distance = route.get('total_distance_km', 50)
@@ -594,9 +600,60 @@ def run_simulation():
     # CO2 emissions (2.31 kg CO2 per liter of diesel)
     co2_emissions = fuel_used * 2.31
 
-    # Calculate utilization
-    estimated_weight = base_done * weight_1100L * 0.5  # rough estimate
-    utilization = min(1.0, estimated_weight / max(capacity, 1))
+    # Calculate collected waste in kg:
+    # Waste Collected = Σ(Expected Weight x Collected Container) for Done tasks.
+    collected_waste_kg = 0.0
+    collected_containers = 0.0
+    date_str = route.get('date', '')
+    route_name = route.get('route_name', '')
+    csv_route_name = route_name if 'V 2.0' in route_name else f'{route_name} - V 2.0'
+
+    tasks = load_task_csv(date_str)
+    if tasks:
+        route_tasks = [t for t in tasks if t.get('route_name') == csv_route_name and t.get('task_status') == 'Done']
+        for task in route_tasks:
+            completed_type = str(task.get('completed_asset_types', '')).strip().lower()
+            asset_types = str(task.get('asset_types', '')).strip().lower()
+            collects_raw = str(task.get('asset_collects', '')).strip()
+
+            try:
+                collects = float(collects_raw) if collects_raw else 0.0
+            except (TypeError, ValueError):
+                collects = 0.0
+
+            if collects <= 0:
+                collects = 1.0
+
+            # Determine expected weight by collected container type.
+            if '240' in completed_type:
+                expected_weight = weight_240L
+            elif '1100' in completed_type:
+                expected_weight = weight_1100L
+            elif '240' in asset_types and '1100' not in asset_types:
+                expected_weight = weight_240L
+            else:
+                expected_weight = weight_1100L
+
+            collected_containers += collects
+            collected_waste_kg += expected_weight * collects
+
+    if collected_waste_kg <= 0:
+        # Fallback: use route service points (Done) with expected weights.
+        service_points = route.get('service_points', [])
+        done_points = [sp for sp in service_points if str(sp.get('status', '')).lower() == 'done']
+        if done_points:
+            for sp in done_points:
+                container_type = str(sp.get('container_type', '')).lower()
+                expected_weight = weight_240L if '240' in container_type else weight_1100L
+                collected_containers += 1.0
+                collected_waste_kg += expected_weight
+        else:
+            collected_containers = float(base_done)
+            collected_waste_kg = base_done * weight_1100L
+
+    utilization_percent = None
+    if capacity and capacity > 0:
+        utilization_percent = (collected_waste_kg / capacity) * 100
 
     result = {
         'route_id': route_id,
@@ -617,7 +674,11 @@ def run_simulation():
         'disposal_cost': disposal_cost,
         'total_cost': round(total_cost, 2),
         'co2': round(co2_emissions, 2),
-        'utilization': round(utilization, 4),
+        'vehicle_capacity_kg': round(capacity, 2),
+        'collected_waste_kg': round(collected_waste_kg, 2),
+        'collected_containers': round(collected_containers, 2),
+        'utilization_percent': round(utilization_percent, 2) if utilization_percent is not None else None,
+        'utilization': round(utilization_percent, 2) if utilization_percent is not None else None,
         'rate': round(base_done / max(base_tasks, 1), 4)
     }
 
