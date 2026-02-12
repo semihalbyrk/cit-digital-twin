@@ -2,8 +2,21 @@
 
 const Charts = {
   instances: {},
-  defaultFontColor: '#A0AEC0',
-  gridColor: 'rgba(74, 85, 104, 0.3)',
+  defaultFontColor: '#98a2b3',
+  gridColor: 'rgba(208, 213, 221, 0.3)',
+
+  // Brand colors from design tokens
+  colors: {
+    done: '#36a734',
+    visited: '#F59E0B',
+    todo: '#E03C39',
+    info: '#3B82F6',
+    teal: '#5fc595',
+    purple: '#6554c0',
+    pink: '#ef186b',
+    darkBlue: '#0b2b51',
+    lightBlue: '#2563eb',
+  },
 
   // Common chart options
   getCommonOptions(overrides = {}) {
@@ -23,10 +36,10 @@ const Charts = {
           }
         },
         tooltip: {
-          backgroundColor: '#1A1F2E',
-          titleColor: '#FFFFFF',
-          bodyColor: '#A0AEC0',
-          borderColor: '#3A4557',
+          backgroundColor: '#0b2b51',
+          titleColor: '#ffffff',
+          bodyColor: '#d0d5dd',
+          borderColor: '#1a3a52',
           borderWidth: 1,
           padding: 12,
           cornerRadius: 8,
@@ -62,21 +75,21 @@ const Charts = {
           {
             label: 'Done',
             data: data.done,
-            backgroundColor: '#36A734',
+            backgroundColor: this.colors.done,
             borderRadius: 4,
             borderSkipped: false
           },
           {
             label: 'Visited',
             data: data.visited,
-            backgroundColor: '#F59E0B',
+            backgroundColor: this.colors.visited,
             borderRadius: 4,
             borderSkipped: false
           },
           {
             label: 'To-Do',
             data: data.todo,
-            backgroundColor: '#E03C39',
+            backgroundColor: this.colors.todo,
             borderRadius: 4,
             borderSkipped: false
           }
@@ -118,9 +131,9 @@ const Charts = {
           label: 'Completion Rate (%)',
           data: data.rates,
           backgroundColor: data.rates.map(rate =>
-            rate >= 90 ? '#36A734' :
-            rate >= 70 ? '#3B82F6' :
-            rate >= 50 ? '#F59E0B' : '#E03C39'
+            rate >= 90 ? this.colors.done :
+            rate >= 70 ? this.colors.info :
+            rate >= 50 ? this.colors.visited : this.colors.todo
           ),
           borderRadius: 4,
           borderSkipped: false
@@ -167,7 +180,7 @@ const Charts = {
         labels: ['Done', 'Visited', 'To-Do'],
         datasets: [{
           data: [data.done, data.visited, data.todo],
-          backgroundColor: ['#36A734', '#F59E0B', '#E03C39'],
+          backgroundColor: [this.colors.done, this.colors.visited, this.colors.todo],
           borderWidth: 0,
           cutout: '70%',
           borderRadius: 4
@@ -211,19 +224,19 @@ const Charts = {
           {
             label: 'Fuel Cost',
             data: data.fuel,
-            backgroundColor: '#E03C39',
+            backgroundColor: this.colors.todo,
             borderRadius: 4
           },
           {
             label: 'Labor Cost',
             data: data.labor,
-            backgroundColor: '#3B82F6',
+            backgroundColor: this.colors.info,
             borderRadius: 4
           },
           {
             label: 'Vehicle Cost',
             data: data.vehicle,
-            backgroundColor: '#F59E0B',
+            backgroundColor: this.colors.visited,
             borderRadius: 4
           }
         ]
@@ -286,7 +299,7 @@ const Charts = {
     this.destroy(elementId);
 
     const colors = data.labels.map((_, i) =>
-      i === 0 ? '#3B82F6' : '#0099CC'
+      i === 0 ? this.colors.info : this.colors.lightBlue
     );
 
     this.instances[elementId] = new Chart(ctx, {
@@ -349,12 +362,12 @@ const Charts = {
           {
             label: 'Completion Rate',
             data: data.rates,
-            borderColor: '#0099CC',
-            backgroundColor: 'rgba(0, 153, 204, 0.1)',
+            borderColor: this.colors.lightBlue,
+            backgroundColor: 'rgba(15, 137, 198, 0.1)',
             fill: true,
             tension: 0.3,
-            pointBackgroundColor: '#0099CC',
-            pointBorderColor: '#1A1F2E',
+            pointBackgroundColor: this.colors.lightBlue,
+            pointBorderColor: this.colors.darkBlue,
             pointBorderWidth: 2,
             pointRadius: 5,
             pointHoverRadius: 7

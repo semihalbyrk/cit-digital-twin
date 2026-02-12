@@ -151,8 +151,8 @@ body {
 }
 
 .tab-btn.active {
-  color: var(--primary-dark);
-  border-bottom-color: var(--primary-dark);
+  color: var(--primary);
+  border-bottom-color: var(--primary);
   font-weight: 600;
 }
 
@@ -178,20 +178,22 @@ body {
   text-align: center;
   margin-bottom: 32px;
   border: none;
-  background: none;
+  background-color: var(--primary-dark);
   box-shadow: none;
+  padding: 40px 20px;
+  border-radius: var(--radius-lg);
 }
 
 .route-plan-hero h1 {
   font-size: 28px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: white;
   margin-bottom: 8px;
 }
 
 .route-plan-hero p {
-  font-size: 16px;
-  color: var(--text-secondary);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .selector-card {
@@ -484,7 +486,7 @@ p {
 }
 
 .btn-primary {
-  background-color: var(--color-done);
+  background-color: var(--primary);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -496,13 +498,13 @@ p {
 }
 
 .btn-primary:hover {
-  background-color: #2D8228;
-  box-shadow: 0 4px 12px rgba(54, 167, 52, 0.3);
+  background-color: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(59, 169, 53, 0.3);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
 }
 
 .btn-primary:active {
+  background-color: var(--primary-active);
   transform: translateY(0);
 }
 
@@ -524,8 +526,9 @@ p {
 }
 
 .btn-secondary:hover {
-  background-color: var(--border-color);
-  color: var(--text-primary);
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: var(--primary-light);
 }
 
 .btn-danger {
@@ -663,12 +666,12 @@ p {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: var(--grey-300);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: var(--grey-400);
 }
 
 /* Loading State */
@@ -700,30 +703,32 @@ p {
   display: flex;
   align-items: center;
   gap: 10px;
+  border: 1px solid transparent;
+  border-left: 4px solid transparent;
 }
 
 .alert-info {
-  background-color: rgba(59, 130, 246, 0.1);
-  border: 1px solid var(--color-info);
-  color: var(--color-info);
+  background-color: var(--color-info-light);
+  border-left-color: var(--color-info);
+  color: var(--color-info-dark);
 }
 
 .alert-success {
-  background-color: rgba(54, 167, 52, 0.1);
-  border: 1px solid var(--color-done);
-  color: var(--color-done);
+  background-color: var(--color-done-light);
+  border-left-color: var(--color-done);
+  color: var(--color-done-dark);
 }
 
 .alert-warning {
-  background-color: rgba(245, 158, 11, 0.1);
-  border: 1px solid var(--color-visited);
-  color: var(--color-visited);
+  background-color: var(--color-visited-light);
+  border-left-color: var(--color-visited);
+  color: var(--color-visited-dark);
 }
 
 .alert-error {
-  background-color: rgba(224, 60, 57, 0.1);
-  border: 1px solid var(--color-todo);
-  color: var(--color-todo);
+  background-color: var(--color-todo-light);
+  border-left-color: var(--color-todo);
+  color: var(--color-todo-dark);
 }
 
 /* Tooltip */
@@ -765,8 +770,8 @@ p {
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -775,21 +780,25 @@ p {
 .badge-done {
   background-color: var(--color-done-light);
   color: var(--color-done-dark);
+  border: 1.5px solid var(--color-done);
 }
 
 .badge-visited {
   background-color: var(--color-visited-light);
   color: var(--color-visited-dark);
+  border: 1.5px solid var(--color-visited);
 }
 
 .badge-todo {
   background-color: var(--color-todo-light);
   color: var(--color-todo-dark);
+  border: 1.5px solid var(--color-todo);
 }
 
 .badge-info {
   background-color: var(--color-info-light);
   color: var(--color-info-dark);
+  border: 1.5px solid var(--color-info);
 }
 
 /* Empty State */
@@ -823,7 +832,7 @@ p {
 /* ─── Route Selector Page ─────────────────────────────────────────────────── */
 
 .route-info-hero {
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+  background: var(--primary-dark);
   border: none;
   padding: 32px;
   margin-bottom: 24px;
@@ -923,12 +932,12 @@ p {
 }
 
 #date-selector-table tbody tr:hover {
-  background-color: rgba(59, 130, 246, 0.08);
+  background-color: rgba(59, 169, 53, 0.08);
 }
 
 /* Select Button */
 .btn-select {
-  background-color: var(--accent-blue);
+  background-color: var(--primary);
   color: white;
   padding: 8px 16px;
   border-radius: var(--radius-md);
@@ -940,7 +949,7 @@ p {
 }
 
 .btn-select:hover {
-  background-color: #2563EB;
+  background-color: var(--primary-hover);
   transform: translateY(-1px);
 }
 
@@ -1206,7 +1215,7 @@ p {
 
 .freq-kpi-card.highlight {
   border-color: var(--color-done);
-  background: rgba(54, 167, 52, 0.05);
+  background: rgba(59, 169, 53, 0.05);
 }
 
 .freq-kpi-value {
@@ -1293,18 +1302,18 @@ p {
 }
 
 .confidence-card.high {
-  background: rgba(54, 167, 52, 0.08);
-  border-color: rgba(54, 167, 52, 0.3);
+  background: rgba(59, 169, 53, 0.08);
+  border-color: rgba(59, 169, 53, 0.3);
 }
 
 .confidence-card.medium {
-  background: rgba(245, 166, 35, 0.08);
-  border-color: rgba(245, 166, 35, 0.3);
+  background: rgba(254, 168, 0, 0.08);
+  border-color: rgba(254, 168, 0, 0.3);
 }
 
 .confidence-card.low {
-  background: rgba(234, 67, 53, 0.08);
-  border-color: rgba(234, 67, 53, 0.3);
+  background: rgba(224, 60, 57, 0.08);
+  border-color: rgba(224, 60, 57, 0.3);
 }
 
 .confidence-card-value {
@@ -1343,17 +1352,17 @@ p {
 }
 
 .confidence-badge.high {
-  background: rgba(54, 167, 52, 0.15);
+  background: rgba(59, 169, 53, 0.15);
   color: var(--color-done);
 }
 
 .confidence-badge.medium {
-  background: rgba(245, 166, 35, 0.15);
+  background: rgba(254, 168, 0, 0.15);
   color: var(--color-visited);
 }
 
 .confidence-badge.low {
-  background: rgba(234, 67, 53, 0.15);
+  background: rgba(224, 60, 57, 0.15);
   color: var(--color-todo);
 }
 
@@ -1368,12 +1377,12 @@ p {
 }
 
 .day-badge.good {
-  background: rgba(54, 167, 52, 0.15);
+  background: rgba(59, 169, 53, 0.15);
   color: var(--color-done);
 }
 
 .day-badge.bad {
-  background: rgba(234, 67, 53, 0.15);
+  background: rgba(224, 60, 57, 0.15);
   color: var(--color-todo);
 }
 
@@ -1594,11 +1603,11 @@ p {
 }
 
 .freq-day-cell.good {
-  background: rgba(54, 167, 52, 0.04);
+  background: rgba(59, 169, 53, 0.04);
 }
 
 .freq-day-cell.bad {
-  background: rgba(234, 67, 53, 0.04);
+  background: rgba(224, 60, 57, 0.04);
 }
 
 .freq-sp-savings {

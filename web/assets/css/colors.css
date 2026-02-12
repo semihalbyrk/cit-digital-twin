@@ -1,91 +1,272 @@
-/* CIT Digital Twin - Color Palette & Design Tokens */
-/* Branding: Light Theme with Navy Primary */
+/* CIT Digital Twin - Evreka 360 Design System */
+/* Complete brand palette and design tokens */
 
 :root {
-  /* Primary Colors */
-  --primary-dark: #0B2B51;
-  --primary-light: #1A3A63;
+  /* ─── Base Colors ──────────────────────────────────────────────────────── */
+  --base-white: #ffffff;
+  --base-black: #000000;
+
+  /* ─── Grey Palette ─────────────────────────────────────────────────────── */
+  --grey-25: #fcfcfd;
+  --grey-50: #f9fafb;
+  --grey-100: #f2f4f7;
+  --grey-200: #eaecf0;
+  --grey-300: #d0d5dd;
+  --grey-400: #98a2b3;
+  --grey-500: #667085;
+  --grey-600: #475467;
+  --grey-700: #344054;
+  --grey-800: #1d2939;
+  --grey-900: #101828;
+
+  /* ─── Dark Blue Palette ────────────────────────────────────────────────── */
+  --dark-blue-25: #fbfdff;
+  --dark-blue-50: #f7faff;
+  --dark-blue-100: #f5f7ff;
+  --dark-blue-200: #e2e7f5;
+  --dark-blue-300: #c8cee0;
+  --dark-blue-400: #adb4cb;
+  --dark-blue-500: #878ea8;
+  --dark-blue-600: #535a72;
+  --dark-blue-700: #414f6a;
+  --dark-blue-800: #2f4362;
+  --dark-blue-900: #0b2b51;
+
+  /* ─── Blue Palette ─────────────────────────────────────────────────────── */
+  --blue-25: #ddf2fc;
+  --blue-50: #bbe5fa;
+  --blue-100: #99d8f7;
+  --blue-200: #78cbf5;
+  --blue-300: #56bef2;
+  --blue-400: #34b1f0;
+  --blue-500: #12a4ed;
+  --blue-600: #1096d9;
+  --blue-700: #0f89c6;
+  --blue-800: #0e7bb2;
+  --blue-900: #0c6d9e;
+
+  /* ─── Green Palette ────────────────────────────────────────────────────── */
+  --green-25: #e1f5e0;
+  --green-50: #c3ebc0;
+  --green-100: #a4e2a1;
+  --green-200: #86d882;
+  --green-300: #68ce62;
+  --green-400: #4ac443;
+  --green-500: #3ba935;
+  --green-600: #369b31;
+  --green-700: #318d2c;
+  --green-800: #2c7f28;
+  --green-900: #277123;
+
+  /* ─── Teal Palette ─────────────────────────────────────────────────────── */
+  --teal-25: #e8f7f0;
+  --teal-50: #d1eee1;
+  --teal-100: #bae6d2;
+  --teal-200: #a4dec2;
+  --teal-300: #8dd6b3;
+  --teal-400: #76cda4;
+  --teal-500: #5fc595;
+  --teal-600: #4dbf89;
+  --teal-700: #41b37d;
+  --teal-800: #3aa171;
+  --teal-900: #348f64;
+
+  /* ─── Light Green Palette ──────────────────────────────────────────────── */
+  --light-green-25: #edfade;
+  --light-green-50: #daf5bd;
+  --light-green-100: #c8f09c;
+  --light-green-200: #b6eb7b;
+  --light-green-300: #a3e659;
+  --light-green-400: #91e138;
+  --light-green-500: #7ed320;
+  --light-green-600: #74c11d;
+  --light-green-700: #69b01b;
+  --light-green-800: #5f9e18;
+  --light-green-900: #548d15;
+
+  /* ─── Yellow Palette ───────────────────────────────────────────────────── */
+  --yellow-25: #fff7db;
+  --yellow-50: #fff0b6;
+  --yellow-100: #ffe892;
+  --yellow-200: #ffe16d;
+  --yellow-300: #ffd949;
+  --yellow-400: #ffd224;
+  --yellow-500: #ffca00;
+  --yellow-600: #eab900;
+  --yellow-700: #d5a800;
+  --yellow-800: #bf9700;
+  --yellow-900: #aa8700;
+
+  /* ─── Orange Palette ───────────────────────────────────────────────────── */
+  --orange-25: #fff3da;
+  --orange-50: #ffe6b6;
+  --orange-100: #ffda91;
+  --orange-200: #ffcd6d;
+  --orange-300: #ffc148;
+  --orange-400: #ffb524;
+  --orange-500: #fea800;
+  --orange-600: #e99a00;
+  --orange-700: #d48c00;
+  --orange-800: #bf7e00;
+  --orange-900: #a97000;
+
+  /* ─── Red Palette ──────────────────────────────────────────────────────── */
+  --red-25: #fbe6e6;
+  --red-50: #f7cecd;
+  --red-100: #f3b5b4;
+  --red-200: #ef9c9a;
+  --red-300: #eb8381;
+  --red-400: #e76b68;
+  --red-500: #e3524f;
+  --red-600: #e03c39;
+  --red-700: #dc2723;
+  --red-800: #c62320;
+  --red-900: #b01f1c;
+
+  /* ─── Pink Palette ─────────────────────────────────────────────────────── */
+  --pink-25: #fddeea;
+  --pink-50: #fabdd5;
+  --pink-100: #f89cc0;
+  --pink-200: #f67baa;
+  --pink-300: #f45a95;
+  --pink-400: #f13980;
+  --pink-500: #ef186b;
+  --pink-600: #e11061;
+  --pink-700: #cd0e58;
+  --pink-800: #b80d4f;
+  --pink-900: #a40b46;
+
+  /* ─── Purple Palette ───────────────────────────────────────────────────── */
+  --purple-25: #e9e7f6;
+  --purple-50: #d3ceed;
+  --purple-100: #bdb6e4;
+  --purple-200: #a79ddb;
+  --purple-300: #9185d2;
+  --purple-400: #7b6cc9;
+  --purple-500: #6554c0;
+  --purple-600: #5644b9;
+  --purple-700: #4f3ea8;
+  --purple-800: #473897;
+  --purple-900: #3f3286;
+
+  /* ─── Cyan Palette (Evreka Primary Brand) ──────────────────────────────── */
+  --cyan-50: #e1f5fa;
+  --cyan-100: #b3e5f6;
+  --cyan-200: #80d4f0;
+  --cyan-300: #4dc3ea;
+  --cyan-400: #26b6e5;
+  --cyan-500: #00a8d8;
+  --cyan-600: #0099c7;
+  --cyan-700: #0088b5;
+  --cyan-800: #0078a3;
+  --cyan-900: #005a82;
+
+  /* ─── Semantic Color Mapping (CIT Brand) ───────────────────────────────── */
+
+  /* Primary Brand Color = Green */
+  --primary: rgb(59, 169, 53);
+  --primary-hover: rgb(50, 145, 45);
+  --primary-active: rgb(42, 125, 38);
+  --primary-light: rgba(59, 169, 53, 0.05);
+  --primary-glow: rgba(59, 169, 53, 0.15);
+
+  /* Dark background (sidebar, banners) */
+  --primary-dark: #0b2b51;
+
+  /* Accent blue (links, focus, info) */
   --accent-blue: #3B82F6;
 
   /* Status Colors */
-  --color-done: #36A734;
+  --color-done: #36a734;
   --color-visited: #F59E0B;
   --color-todo: #E03C39;
   --color-info: #3B82F6;
 
   /* Light variants (for badges, backgrounds) */
-  --color-done-light: #DCFCDA;
-  --color-visited-light: #FEF3C7;
-  --color-todo-light: #FBE6E6;
-  --color-info-light: #DBEAFE;
+  --color-done-light: #e8f5e9;
+  --color-visited-light: #fff3e0;
+  --color-todo-light: #ffebee;
+  --color-info-light: #eff6ff;
 
   /* Dark variants (for text on light backgrounds) */
-  --color-done-dark: #15803D;
-  --color-visited-dark: #B45309;
-  --color-todo-dark: #B91C1C;
-  --color-info-dark: #1D4ED8;
+  --color-done-dark: #2d7a2b;
+  --color-visited-dark: #9a6b1b;
+  --color-todo-dark: #a8221f;
+  --color-info-dark: #2563eb;
 
-  /* Backgrounds - Light Theme */
-  --bg-page: #0B2B51;
-  --bg-sidebar: #0B2B51;
-  --bg-card: #FFFFFF;
-  --bg-light: #F8FAFC;
-  --bg-gray: #F1F5F9;
-  --bg-input: #FFFFFF;
-  --bg-hover: rgba(11, 43, 81, 0.04);
-  --bg-active: rgba(11, 43, 81, 0.08);
+  /* ─── Backgrounds ──────────────────────────────────────────────────────── */
+  --bg-page: #f5f7fa;
+  --bg-sidebar: #0b2b51;
+  --bg-card: #ffffff;
+  --bg-light: #f5f7fa;
+  --bg-gray: #f5f7fa;
+  --bg-input: #ffffff;
+  --bg-hover: #f5f7fa;
+  --bg-active: #eef5fa;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f7fa;
 
-  /* Borders */
-  --border-color: #E4E7EC;
-  --border-light: #F1F3F5;
-  --border-focus: var(--accent-blue);
+  /* ─── Borders ──────────────────────────────────────────────────────────── */
+  --border-color: #d4dadc;
+  --border-light: #e8ecef;
+  --border-focus: #3B82F6;
+  --border: #d4dadc;
 
-  /* Text - Dark text on light backgrounds */
-  --text-primary: #101828;
-  --text-secondary: #475467;
-  --text-muted: #98A2B3;
-  --text-link: var(--accent-blue);
+  /* ─── Text Colors ──────────────────────────────────────────────────────── */
+  --text-primary: #1a2332;
+  --text-secondary: #505b6f;
+  --text-muted: #7a8699;
+  --text-link: #3B82F6;
 
   /* White text for dark backgrounds (sidebar, hero) */
-  --text-on-dark: #FFFFFF;
+  --text-on-dark: #ffffff;
   --text-on-dark-secondary: rgba(255, 255, 255, 0.8);
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  /* ─── Shadows ──────────────────────────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.18);
 
-  /* Transitions */
-  --transition-fast: 0.15s ease;
+  /* ─── Transitions ──────────────────────────────────────────────────────── */
+  --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
 
-  /* Border Radius - Slightly more rounded for modern feel */
+  /* ─── Border Radius ────────────────────────────────────────────────────── */
+  --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 12px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 20px;
+  --radius-full: 9999px;
 
-  /* Spacing */
+  /* ─── Spacing ──────────────────────────────────────────────────────────── */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
 
-  /* Z-index layers */
+  /* ─── Z-index Layers ───────────────────────────────────────────────────── */
   --z-dropdown: 100;
   --z-sticky: 200;
   --z-modal: 300;
   --z-tooltip: 400;
-}
 
-/* Chart.js color overrides */
-:root {
-  --chart-done: #36A734;
+  /* ─── Chart.js Color Overrides ─────────────────────────────────────────── */
+  --chart-done: #36a734;
   --chart-visited: #F59E0B;
   --chart-todo: #E03C39;
   --chart-info: #3B82F6;
-  --chart-grid: rgba(228, 231, 236, 0.5);
+  --chart-grid: rgba(212, 218, 220, 0.5);
+  --chart-teal: #5fc595;
+  --chart-purple: #6554c0;
+  --chart-pink: #ef186b;
+  --chart-yellow: #ffca00;
+  --chart-light-green: #7ed320;
 }

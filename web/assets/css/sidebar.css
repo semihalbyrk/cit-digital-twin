@@ -22,7 +22,7 @@
 .sidebar-logo-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, var(--accent-blue), #1E40AF);
+  background: linear-gradient(135deg, var(--accent-blue), var(--dark-blue-700));
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
@@ -81,15 +81,16 @@
 }
 
 .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.15);
   color: var(--text-on-dark);
 }
 
 .nav-item.active {
-  border-left-color: #36A734;
-  background-color: rgba(54, 167, 52, 0.15);
-  color: var(--text-on-dark);
-  font-weight: 500;
+  border-left-color: var(--primary);
+  background-color: var(--primary);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(59, 169, 53, 0.3);
 }
 
 .nav-item-icon {
@@ -128,7 +129,7 @@
 }
 
 .nav-collapse-item:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.15);
   color: var(--text-on-dark);
 }
 
@@ -180,7 +181,7 @@
 }
 
 .nav-child-item.active {
-  color: #36A734;
+  color: var(--primary);
   font-weight: 500;
 }
 
@@ -192,7 +193,7 @@
 }
 
 .nav-child-item.active .nav-child-item-dot {
-  background-color: #36A734;
+  background-color: var(--primary);
 }
 
 /* Sidebar Footer */
@@ -251,15 +252,15 @@
 }
 
 .sidebar-stat-value.done {
-  color: #4ADE80;
+  color: var(--color-done);
 }
 
 .sidebar-stat-value.visited {
-  color: #FBBF24;
+  color: var(--color-visited);
 }
 
 .sidebar-stat-value.todo {
-  color: #F87171;
+  color: var(--color-todo);
 }
 
 /* Collapsed Sidebar */

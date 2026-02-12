@@ -96,11 +96,11 @@ tbody tr.row-todo {
 }
 
 tbody tr.row-depot {
-  background-color: rgba(100, 116, 139, 0.08);
+  background-color: rgba(102, 112, 133, 0.08);
 }
 
 tbody tr.row-disposal {
-  background-color: rgba(139, 92, 246, 0.08);
+  background-color: rgba(101, 84, 192, 0.08);
 }
 
 tbody tr.row-done:hover {
