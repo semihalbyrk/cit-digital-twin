@@ -1,0 +1,181 @@
+<div class="page removing-visited">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb mb-20">
+    <a href="#home">Home</a>
+    <span class="breadcrumb-sep">&#8250;</span>
+    <a href="#what-if">What-If Actions</a>
+    <span class="breadcrumb-sep">&#8250;</span>
+    <span>Removing Visited Tasks</span>
+  </div>
+
+  <!-- Two-column layout -->
+  <div class="two-column-grid">
+    <!-- Left: Task Selection -->
+    <div class="left-panel">
+      <!-- Scenario Setup -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Scenario Configuration</h2>
+        </div>
+        <div class="form-group">
+          <label>Scenario Name</label>
+          <input type="text" id="scenario-name" value="Remove Visited Tasks" placeholder="Enter scenario name">
+        </div>
+        <div class="form-group">
+          <label>Description (optional)</label>
+          <textarea id="scenario-description" rows="2" placeholder="Brief description of this scenario..." style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:var(--radius-md);font-size:13px;resize:vertical;font-family:inherit;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Base Route</label>
+          <select id="base-route-select">
+            <!-- Populated by JavaScript -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Visited Tasks Table -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Visited Tasks <span class="text-muted" id="visited-count-label">(0 tasks)</span></h2>
+          <div class="btn-group">
+            <button class="btn-secondary btn-sm" onclick="selectAllVisited()">Select All</button>
+            <button class="btn-secondary btn-sm" onclick="deselectAllVisited()">Deselect All</button>
+          </div>
+        </div>
+
+        <p class="section-description">
+          These tasks were visited but not collected. Select tasks to remove from the optimized scenario.
+        </p>
+
+        <div class="table-container table-scroll" style="max-height: 450px;">
+          <table class="compact" id="visited-tasks-table">
+            <thead>
+              <tr>
+                <th class="col-center" style="width:40px;">
+                  <input type="checkbox" id="select-all-checkbox" onclick="toggleSelectAll(this)">
+                </th>
+                <th>#</th>
+                <th>Service Point</th>
+                <th>Container</th>
+                <th class="numeric">Fill Rate</th>
+              </tr>
+            </thead>
+            <tbody id="visited-tasks-body">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="selection-summary mt-20" id="selection-summary">
+          <span class="selection-count"><span id="selected-count">0</span> tasks selected for removal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Impact Preview -->
+    <div class="right-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2>Impact Preview</h2>
+        </div>
+        <p class="text-sm text-muted mb-20">See the estimated impact of removing selected tasks.</p>
+
+        <!-- Comparison Table -->
+        <div class="impact-comparison">
+          <div class="impact-header">
+            <div class="impact-col metric-col">Metric</div>
+            <div class="impact-col">V0 Baseline</div>
+            <div class="impact-col">V1 Scenario</div>
+            <div class="impact-col delta-col">Delta</div>
+          </div>
+
+          <!-- Operational Metrics -->
+          <div class="impact-section">
+            <div class="impact-section-title">Operational</div>
+            <div class="impact-row">
+              <div class="impact-col metric-col">Total Tasks</div>
+              <div class="impact-col" id="v0-tasks">--</div>
+              <div class="impact-col" id="v1-tasks">--</div>
+              <div class="impact-col delta-col" id="delta-tasks">--</div>
+            </div>
+            <div class="impact-row">
+              <div class="impact-col metric-col">Service Points</div>
+              <div class="impact-col" id="v0-sps">--</div>
+              <div class="impact-col" id="v1-sps">--</div>
+              <div class="impact-col delta-col" id="delta-sps">--</div>
+            </div>
+            <div class="impact-row">
+              <div class="impact-col metric-col">Distance</div>
+              <div class="impact-col" id="v0-distance">--</div>
+              <div class="impact-col" id="v1-distance">--</div>
+              <div class="impact-col delta-col" id="delta-distance">--</div>
+            </div>
+            <div class="impact-row">
+              <div class="impact-col metric-col">Total Time</div>
+              <div class="impact-col" id="v0-time">--</div>
+              <div class="impact-col" id="v1-time">--</div>
+              <div class="impact-col delta-col" id="delta-time">--</div>
+            </div>
+          </div>
+
+          <!-- Financial Metrics -->
+          <div class="impact-section">
+            <div class="impact-section-title">Financial</div>
+            <div class="impact-row">
+              <div class="impact-col metric-col">Fuel Cost</div>
+              <div class="impact-col" id="v0-fuel-cost">--</div>
+              <div class="impact-col" id="v1-fuel-cost">--</div>
+              <div class="impact-col delta-col" id="delta-fuel-cost">--</div>
+            </div>
+            <div class="impact-row">
+              <div class="impact-col metric-col">Labor Cost</div>
+              <div class="impact-col" id="v0-labor-cost">--</div>
+              <div class="impact-col" id="v1-labor-cost">--</div>
+              <div class="impact-col delta-col" id="delta-labor-cost">--</div>
+            </div>
+            <div class="impact-row highlight">
+              <div class="impact-col metric-col">Total Cost</div>
+              <div class="impact-col" id="v0-total-cost">--</div>
+              <div class="impact-col" id="v1-total-cost">--</div>
+              <div class="impact-col delta-col" id="delta-total-cost">--</div>
+            </div>
+          </div>
+
+          <!-- Environmental Metrics -->
+          <div class="impact-section">
+            <div class="impact-section-title">Environmental</div>
+            <div class="impact-row">
+              <div class="impact-col metric-col">Fuel Used</div>
+              <div class="impact-col" id="v0-fuel-used">--</div>
+              <div class="impact-col" id="v1-fuel-used">--</div>
+              <div class="impact-col delta-col" id="delta-fuel-used">--</div>
+            </div>
+            <div class="impact-row">
+              <div class="impact-col metric-col">CO2 Emissions</div>
+              <div class="impact-col" id="v0-co2">--</div>
+              <div class="impact-col" id="v1-co2">--</div>
+              <div class="impact-col delta-col" id="delta-co2">--</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="impact-summary mt-20" id="impact-summary">
+          <div class="summary-text" id="summary-text">
+            Select visited tasks to see the estimated savings.
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions mt-20">
+          <button class="btn-primary btn-large" onclick="saveScenario()">
+            &#128190; SAVE SCENARIO
+          </button>
+        </div>
+        <button class="btn-secondary w-100 mt-10" onclick="navigateToPage('compare-scenarios')">
+          &#9879; Compare with Baseline
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

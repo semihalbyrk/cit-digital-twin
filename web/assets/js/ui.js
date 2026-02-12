@@ -18,39 +18,54 @@ const UI = {
       <nav class="sidebar-nav">
         <div class="nav-section">
           <div class="nav-section-title">Dashboard</div>
-          <div class="nav-item active" data-nav="route-selector" onclick="navigateToPage('route-selector')">
-            <span class="nav-item-icon">&#128197;</span>
-            <span class="nav-item-text">Route Selector</span>
-          </div>
-          <div class="nav-item" data-nav="v0-overview" onclick="navigateToPage('v0-overview')">
-            <span class="nav-item-icon">&#9776;</span>
-            <span class="nav-item-text">V0 Overview</span>
-          </div>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Routes</div>
-          <div class="nav-collapse" id="routes-collapse">
-            <div class="nav-collapse-item" onclick="UI.toggleCollapse('routes-collapse')">
-              <span class="nav-item-icon">&#9670;</span>
-              <span class="nav-item-text">Route Detail</span>
-              <span class="collapse-icon">&#9654;</span>
-            </div>
-            <div class="nav-children" id="route-nav-list">
-              <!-- Populated dynamically -->
-            </div>
+          <div class="nav-item active" data-nav="home" onclick="navigateToPage('home')">
+            <span class="nav-item-icon">&#127968;</span>
+            <span class="nav-item-text">Home</span>
           </div>
         </div>
 
         <div class="nav-section">
           <div class="nav-section-title">Analysis</div>
-          <div class="nav-item" data-nav="what-if-analysis" onclick="navigateToPage('what-if-analysis')">
-            <span class="nav-item-icon">&#9881;</span>
-            <span class="nav-item-text">What-If Analysis</span>
+          <div class="nav-collapse" id="nav-what-if">
+            <div class="nav-collapse-item" onclick="UI.toggleCollapse('nav-what-if')">
+              <span class="nav-item-icon">&#9881;</span>
+              <span class="nav-item-text">What-If Actions</span>
+              <span class="collapse-icon">&#9654;</span>
+            </div>
+            <div class="nav-children">
+              <div class="nav-child-item" data-nav="removing-visited" onclick="navigateToPage('removing-visited')">
+                <span class="nav-child-item-dot"></span>
+                <span>Removing Visited Tasks</span>
+              </div>
+              <div class="nav-collapse" id="nav-frequency">
+                <div class="nav-collapse-item" onclick="UI.toggleCollapse('nav-frequency')" style="padding-left:52px;">
+                  <span class="nav-item-text" style="font-size:13px;">Frequency Optimization</span>
+                  <span class="collapse-icon">&#9654;</span>
+                </div>
+                <div class="nav-children">
+                  <div class="nav-child-item" data-nav="frequency-analysis" onclick="navigateToPage('frequency-analysis')" style="padding-left:68px;">
+                    <span class="nav-child-item-dot"></span>
+                    <span>Region Analysis</span>
+                  </div>
+                  <div class="nav-child-item" data-nav="frequency-optimize" onclick="navigateToPage('frequency-optimize')" style="padding-left:68px;">
+                    <span class="nav-child-item-dot"></span>
+                    <span>Optimize & Compare</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="nav-item" data-nav="comparison" onclick="navigateToPage('comparison')">
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Scenarios</div>
+          <div class="nav-item" data-nav="saved-scenarios" onclick="navigateToPage('saved-scenarios')">
+            <span class="nav-item-icon">&#128190;</span>
+            <span class="nav-item-text">Saved Scenarios</span>
+          </div>
+          <div class="nav-item" data-nav="compare-scenarios" onclick="navigateToPage('compare-scenarios')">
             <span class="nav-item-icon">&#9878;</span>
-            <span class="nav-item-text">Comparison</span>
+            <span class="nav-item-text">Compare Scenarios</span>
           </div>
         </div>
       </nav>
@@ -62,45 +77,11 @@ const UI = {
           <span class="sidebar-stat-value" id="sidebar-routes">--</span>
         </div>
         <div class="sidebar-stat">
-          <span class="sidebar-stat-label">Scenarios</span>
-          <span class="sidebar-stat-value" id="sidebar-scenarios">0</span>
-        </div>
-        <div class="sidebar-stat">
           <span class="sidebar-stat-label">Avg Rate</span>
           <span class="sidebar-stat-value done" id="sidebar-rate">--</span>
         </div>
       </div>
     `;
-
-    this.populateRouteNav();
-  },
-
-  // Populate route navigation items
-  populateRouteNav() {
-    const container = document.getElementById('route-nav-list');
-    if (!container) return;
-
-    const routes = getRoutes();
-    const byDay = groupBy(routes, 'day');
-
-    let html = '';
-    DAY_ORDER.forEach(day => {
-      const dayRoutes = byDay[day] || [];
-      if (dayRoutes.length === 0) return;
-
-      html += `<div class="nav-child-item" style="color:var(--text-muted);font-weight:600;padding-left:32px;font-size:11px;text-transform:uppercase;cursor:default;">${day}</div>`;
-      dayRoutes.forEach(route => {
-        html += `
-          <div class="nav-child-item" data-nav="route-${route.route_id}"
-               onclick="navigateToPage('route-detail', {id: '${route.route_id}'})">
-            <span class="nav-child-item-dot"></span>
-            ${route.route_name}
-          </div>
-        `;
-      });
-    });
-
-    container.innerHTML = html;
   },
 
   // Toggle collapse
@@ -110,7 +91,7 @@ const UI = {
   },
 
   // Render header
-  renderHeader(title, subtitle = '') {
+  renderHeader(title, subtitle = '', options = {}) {
     const header = document.getElementById('header');
     header.innerHTML = `
       <div class="header-left">
@@ -121,8 +102,8 @@ const UI = {
         ${subtitle ? `<p class="subtitle" style="margin-bottom:0">${subtitle}</p>` : ''}
       </div>
       <div class="header-right">
-        <span class="header-badge active">V0 Baseline</span>
-        <span class="header-badge">${Scenarios.list().length} Scenarios</span>
+        ${options.rightHtml || ''}
+        <span class="header-date-filter">05.01 - 11.01.2026</span>
       </div>
     `;
   },
@@ -244,16 +225,246 @@ const UI = {
           <div class="empty-state-icon">&#9888;</div>
           <div class="empty-state-title">Page Not Found</div>
           <div class="empty-state-text">Could not load "${pageName}". Please try again.</div>
-          <button class="btn-primary mt-20" onclick="navigateToPage('v0-overview')">Go to Overview</button>
+          <button class="btn-primary mt-20" onclick="navigateToPage('home')">Go to Home</button>
         </div>
       `;
     }
   }
 };
 
+// Global navigation functions
+function continueToHome() {
+  window.selectedRoutePlan = document.getElementById('route-plan-select')?.value || 'zone-2b-day';
+  // Show sidebar again
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.style.display = '';
+  navigateToPage('home');
+}
+
+// Ensure sidebar is shown for non-selection pages
+function ensureSidebarVisible() {
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.style.display = '';
+}
+
+// Switch between tabs on route-detail page
+function switchTab(tabId) {
+  // Toggle tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabId);
+  });
+
+  // Toggle tab content
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.toggle('active', content.id === `tab-${tabId}`);
+  });
+
+  // Lazy-load Route Details tab on first switch
+  if (tabId === 'route-details' && !window._routeDetailsLoaded) {
+    loadRouteDetailsTab();
+  }
+}
+
+// Load route details tab data from CSV endpoint
+async function loadRouteDetailsTab() {
+  const routeId = window.currentRouteId;
+  if (!routeId) return;
+
+  const seqBody = document.getElementById('completed-sequence-body');
+  if (seqBody) {
+    seqBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;"><div class="spinner"></div> Loading route sequence...</td></tr>';
+  }
+
+  try {
+    const data = await API.loadRouteTaskSequence(routeId);
+
+    if (data.error && data.completed_sequence.length === 0) {
+      if (seqBody) seqBody.innerHTML = `<tr><td colspan="5" class="text-muted" style="text-align:center;padding:20px;">No CSV data available for this date.</td></tr>`;
+      return;
+    }
+
+    window._routeSequenceData = data.completed_sequence;
+    window._routeDetailsLoaded = true;
+
+    // Update completed count
+    const countEl = document.getElementById('completed-seq-count');
+    if (countEl) countEl.textContent = `(${data.total_completed} items in sequence)`;
+
+    // Render completed sequence with pagination
+    renderCompletedSequencePage(1);
+
+    // Render summary stats
+    const route = getRouteById(routeId);
+    setText('seq-total-distance', `Total Distance: ${formatDistance(route?.total_distance_km || 0)}`);
+    setText('seq-total-time', `Total Time: ${formatTime(route?.total_time_minutes || 0)}`);
+    const doneCount = data.completed_sequence.filter(s => s.status === 'Done').length;
+    setText('seq-tasks-completed', `Tasks Completed: ${doneCount}`);
+
+    // Render incomplete tasks
+    const incBody = document.getElementById('incomplete-tasks-body');
+    const incCount = document.getElementById('incomplete-count');
+    if (incCount) incCount.textContent = `(${data.total_incomplete} service points not visited)`;
+
+    if (incBody) {
+      if (data.incomplete_tasks.length === 0) {
+        incBody.innerHTML = '<tr><td colspan="5" class="text-muted" style="text-align:center;padding:20px;">No incomplete tasks.</td></tr>';
+      } else {
+        incBody.innerHTML = data.incomplete_tasks.map((task, idx) => `
+          <tr class="row-todo">
+            <td class="col-center text-muted">${idx + 1}</td>
+            <td><strong>${task.sp_id}</strong></td>
+            <td><span class="status-badge todo">To Do</span></td>
+            <td>${task.asset_types || '--'}</td>
+            <td>${task.planned_adhoc || 'Planned'}</td>
+          </tr>
+        `).join('');
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load route details:', err);
+    if (seqBody) seqBody.innerHTML = `<tr><td colspan="5" class="text-muted" style="text-align:center;padding:20px;">Failed to load route sequence data.</td></tr>`;
+  }
+}
+
+// Render a page of the completed sequence table
+function renderCompletedSequencePage(page, pageSize = 20) {
+  const data = window._routeSequenceData || [];
+  const totalItems = data.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIdx = (page - 1) * pageSize;
+  const endIdx = Math.min(startIdx + pageSize, totalItems);
+  const pageItems = data.slice(startIdx, endIdx);
+
+  const tbody = document.getElementById('completed-sequence-body');
+  if (tbody) {
+    tbody.innerHTML = pageItems.map(item => {
+      const statusClass = item.status === 'Done' ? 'done' : item.status === 'Visited' ? 'visited' : '';
+      const statusIcon = item.status === 'Done' ? '&#10003;' : item.status === 'Visited' ? '&#9673;' : item.status === 'Start' || item.status === 'End' ? '&#9632;' : '&#9670;';
+      const rowClass = item.type === 'depot_start' || item.type === 'depot_end' ? 'row-depot' : item.type === 'disposal' ? 'row-disposal' : item.status === 'Visited' ? 'row-visited' : '';
+
+      return `
+        <tr class="${rowClass}">
+          <td class="col-center text-muted">${item.seq}</td>
+          <td><strong>${item.sp_id}</strong></td>
+          <td><span class="status-badge ${statusClass}">${statusIcon} ${item.status}</span></td>
+          <td>${item.completed_asset_types || item.asset_types || '--'}</td>
+          <td class="numeric">${item.asset_collects || '--'}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Render pagination
+  const paginationEl = document.getElementById('completed-seq-pagination');
+  if (paginationEl && totalPages > 1) {
+    const pageButtons = [];
+    const maxButtons = 5;
+    let startPage = Math.max(1, page - Math.floor(maxButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+    if (endPage - startPage < maxButtons - 1) {
+      startPage = Math.max(1, endPage - maxButtons + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageButtons.push(`<button class="pagination-btn ${i === page ? 'active' : ''}" onclick="renderCompletedSequencePage(${i}, ${pageSize})">${i}</button>`);
+    }
+
+    paginationEl.innerHTML = `
+      <div class="pagination-info">Showing ${startIdx + 1}-${endIdx} of ${totalItems} items</div>
+      <div class="pagination-controls">
+        <button class="pagination-btn" onclick="renderCompletedSequencePage(1, ${pageSize})" ${page === 1 ? 'disabled' : ''}>First</button>
+        <button class="pagination-btn" onclick="renderCompletedSequencePage(${page - 1}, ${pageSize})" ${page === 1 ? 'disabled' : ''}>Prev</button>
+        ${pageButtons.join('')}
+        <button class="pagination-btn" onclick="renderCompletedSequencePage(${page + 1}, ${pageSize})" ${page === totalPages ? 'disabled' : ''}>Next</button>
+        <button class="pagination-btn" onclick="renderCompletedSequencePage(${totalPages}, ${pageSize})" ${page === totalPages ? 'disabled' : ''}>Last</button>
+      </div>
+    `;
+  } else if (paginationEl) {
+    paginationEl.innerHTML = totalItems > 0 ? `<div class="pagination-info">Showing all ${totalItems} items</div>` : '';
+  }
+}
+
 // Page Controllers - initialization logic for each page
 const PageControllers = {
+  'route-plan-selection': async () => {
+    UI.renderHeader('CIT Digital Twin', 'Route Plan Selection');
+    // Hide sidebar on selection page
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.style.display = 'none';
+  },
+
+  'home': async () => {
+    ensureSidebarVisible();
+    UI.renderHeader('Zone 2 B (Day)', 'Albada Zone-2 | Week of Jan 6-11, 2026', {
+      rightHtml: '<button class="btn-secondary" onclick="navigateToPage(\'route-plan-selection\')">CHANGE ROUTE</button>'
+    });
+
+    // Get Zone 2 B routes
+    const routes = getRoutes();
+    const zone2bRoutes = routes.filter(r => r.route_name === 'Zone 2 B (Day)');
+    zone2bRoutes.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Calculate aggregate KPIs
+    const totalDone = sum(zone2bRoutes, 'tasks_done');
+    const totalVisited = sum(zone2bRoutes, 'tasks_visited');
+    const totalTodo = sum(zone2bRoutes, 'tasks_todo');
+    const totalAll = totalDone + totalVisited + totalTodo;
+    const avgDistance = avg(zone2bRoutes, 'total_distance_km');
+    const avgCost = avg(zone2bRoutes, 'total_cost');
+    const avgRate = avg(zone2bRoutes, 'completion_rate');
+
+    // Render KPI cards
+    UI.renderKPICards('home-kpi-grid', [
+      { icon: '&#10003;', label: 'Done', value: formatNumber(totalDone), subtext: `${formatPercentage(totalDone / totalAll)} of total`, status: 'done' },
+      { icon: '&#9673;', label: 'Visited', value: formatNumber(totalVisited), subtext: `${formatPercentage(totalVisited / totalAll)} of total`, status: 'visited' },
+      { icon: '&#9744;', label: 'To-Do', value: formatNumber(totalTodo), subtext: `${formatPercentage(totalTodo / totalAll)} of total`, status: 'todo' },
+      { icon: '&#9672;', label: 'Avg Distance', value: formatDistance(avgDistance), subtext: 'per route', status: 'info' },
+      { icon: '$', label: 'Avg Cost', value: formatCurrency(avgCost), subtext: 'per route', status: 'info' },
+      { icon: '&#9889;', label: 'Completion Rate', value: formatPercentage(avgRate), subtext: 'avg across routes', status: avgRate >= 0.9 ? 'done' : 'visited' }
+    ]);
+
+    // Render route count
+    const countLabel = document.getElementById('home-route-count');
+    if (countLabel) countLabel.textContent = `${zone2bRoutes.length} route instances`;
+
+    // Render routes table
+    const tbody = document.getElementById('home-routes-body');
+    if (tbody) {
+      tbody.innerHTML = zone2bRoutes.map(route => {
+        const rate = route.completion_rate || 0;
+        const ratePercent = rate > 1 ? rate : rate * 100;
+        const totalTasks = route.tasks_done + route.tasks_visited + route.tasks_todo;
+        const statusLabel = ratePercent >= 90 ? '&#10003; Good' : ratePercent >= 70 ? '&#9888; Fair' : '&#9888; Attention';
+        const statusClass = ratePercent >= 90 ? 'text-done' : ratePercent >= 70 ? 'text-visited' : 'text-todo';
+
+        return `
+          <tr class="clickable" onclick="navigateToPage('route-detail', {id: '${route.route_id}'})">
+            <td><strong>${formatDateFull(route.date)}</strong></td>
+            <td>Day</td>
+            <td class="numeric">${totalTasks}</td>
+            <td class="numeric text-done">${route.tasks_done}</td>
+            <td class="numeric text-visited">${route.tasks_visited}</td>
+            <td class="numeric text-todo">${route.tasks_todo}</td>
+            <td class="numeric">${formatDistance(route.total_distance_km)}</td>
+            <td class="numeric">${formatTime(route.total_time_minutes)}</td>
+            <td class="numeric">${formatCurrency(route.total_cost)}</td>
+            <td class="numeric">${formatCO2(route.co2_emissions_kg)}</td>
+            <td class="${statusClass}">${statusLabel}</td>
+            <td class="col-actions">
+              <button class="btn-select" onclick="event.stopPropagation(); navigateToPage('route-detail', {id: '${route.route_id}'})">
+                SELECT
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+  },
+
   'route-selector': async () => {
+    // Legacy: redirect to home
+    navigateToPage('home');
+    return;
     // Render header
     UI.renderHeader('Route Selection', 'Choose a route instance to analyze');
 
@@ -383,46 +594,45 @@ const PageControllers = {
   },
 
   'route-detail': async () => {
+    ensureSidebarVisible();
     const { params } = getPageParams();
     const routeId = params.id;
 
     if (!routeId) {
-      navigateToPage('route-selector');
+      navigateToPage('home');
       return;
     }
 
     const route = getRouteById(routeId);
     if (!route) {
       showNotification(`Route "${routeId}" not found`, 'error');
-      navigateToPage('route-selector');
+      navigateToPage('home');
       return;
     }
 
     // Store current route for simulation
     window.currentRouteId = routeId;
+    window._routeDetailsLoaded = false;
 
-    // Update header
+    // Update header with correct date format
     const totalTasks = route.tasks_done + route.tasks_visited + route.tasks_todo;
-    UI.renderHeader(route.route_name, `${route.day} | Vehicle: ${route.vehicle_id} | ${totalTasks} tasks`);
+    const dateDisplay = route.date ? formatDateFull(route.date) : route.day;
+    UI.renderHeader(route.route_name, `${dateDisplay} | Vehicle: ${route.vehicle_id} | ${totalTasks} tasks`);
 
-    // Set route name in page
-    const routeNameEl = document.getElementById('route-name');
-    const routeMetaEl = document.getElementById('route-meta');
-    if (routeNameEl) routeNameEl.textContent = route.route_name;
-    if (routeMetaEl) routeMetaEl.textContent = `${route.day} | Vehicle: ${route.vehicle_id} | ${totalTasks} tasks`;
-
-    // Render 8 KPI cards
-    const rate = route.completion_rate || route.rate || 0;
-    const utilization = (route.tasks_done * 550) / 20000; // rough estimate
+    // Render 9 KPI cards (3x3 grid)
+    const utilization = (route.tasks_done * 550) / 20000;
+    const fuelUsed = route.total_distance_km / 6.0;
+    const co2 = fuelUsed * 2.31;
     UI.renderKPICards('route-kpi-grid', [
       { icon: '&#10003;', label: 'Done', value: formatNumber(route.tasks_done), subtext: `${formatPercentage(route.tasks_done / totalTasks)} of total`, status: 'done' },
       { icon: '&#9673;', label: 'Visited', value: formatNumber(route.tasks_visited), subtext: 'Failed attempts', status: 'visited' },
       { icon: '&#9744;', label: 'To-Do', value: formatNumber(route.tasks_todo), subtext: 'Not attempted', status: 'todo' },
       { icon: '&#9672;', label: 'Distance', value: formatDistance(route.total_distance_km), subtext: 'Total route', status: 'info' },
       { icon: '&#9201;', label: 'Time', value: formatTime(route.total_time_minutes), subtext: 'Including breaks', status: 'info' },
-      { icon: '&#128203;', label: 'Tasks', value: formatNumber(totalTasks), subtext: 'Total planned', status: 'info' },
       { icon: '$', label: 'Cost', value: formatCurrency(route.total_cost), subtext: 'All inclusive', status: 'info' },
-      { icon: '&#9889;', label: 'Utilization', value: formatPercentage(Math.min(utilization, 1)), subtext: 'Vehicle capacity', status: utilization >= 0.7 ? 'done' : 'visited' }
+      { icon: '&#9889;', label: 'Utilization', value: formatPercentage(Math.min(utilization, 1)), subtext: 'Vehicle capacity', status: utilization >= 0.7 ? 'done' : 'visited' },
+      { icon: '&#128203;', label: 'Waste', value: `${Math.round(route.tasks_done * 550 * 0.5)} kg`, subtext: 'Estimated collected', status: 'info' },
+      { icon: '&#9729;', label: 'CO2', value: formatCO2(route.co2_emissions_kg || co2), subtext: 'Emissions', status: 'info' }
     ]);
 
     // Render status distribution bar
@@ -447,32 +657,41 @@ const PageControllers = {
       if (todoPct) todoPct.textContent = `(${todoPctVal.toFixed(1)}%)`;
     }
 
-    // Render service points count label
-    const spCountLabel = document.getElementById('sp-count-label');
-    if (spCountLabel && route.service_points) {
-      spCountLabel.textContent = `${route.service_points.length} service points`;
-    }
-
-    // Render paginated service points list
-    if (route.service_points) {
-      renderServicePointsWithPagination(route.service_points, route.zone, 1, 10);
-    }
+    // Populate initial breakdown values from route data
+    const travelTime = route.total_travel_time_minutes || (route.total_time_minutes * 0.3);
+    const serviceTime = route.total_service_time_minutes || (route.total_time_minutes * 0.6);
+    setText('out-travel-time', formatTime(travelTime));
+    setText('out-service-time', formatTime(serviceTime));
+    setText('out-total-time', formatTime(route.total_time_minutes));
+    setText('out-distance', formatDistance(route.total_distance_km));
+    setText('out-fuel-cost', formatCurrency(route.fuel_cost || fuelUsed * 1.5));
+    setText('out-labor-cost', formatCurrency(route.labor_cost || (route.total_time_minutes / 60) * 25));
+    setText('out-total-cost', formatCurrency(route.total_cost));
+    setText('out-fuel-used', `${fuelUsed.toFixed(1)} L`);
+    setText('out-co2', formatCO2(route.co2_emissions_kg || co2));
+    setText('out-utilization', formatPercentage(Math.min(utilization, 1)));
   },
 
-  'what-if-analysis': async () => {
-    UI.renderHeader('What-If Scenario Planner', 'Analyze impact of removing visited tasks');
+  'removing-visited': async () => {
+    ensureSidebarVisible();
+    UI.renderHeader('Removing Visited Tasks', 'Analyze impact of removing visited tasks from routes');
 
-    // Get the current route or default to first Zone 2 B route
-    const routeId = window.currentRouteId || 'Z2-B-Day-Tue';
+    // Check for route param from Route Detail page
+    const { params } = getPageParams();
+    const routeId = params.route || window.currentRouteId || 'Z2-B-Day-Tue';
     const routes = getRoutes();
     const zone2bRoutes = routes.filter(r => r.route_name === 'Zone 2 B (Day)');
     const currentRoute = getRouteById(routeId) || zone2bRoutes[0];
+
+    if (currentRoute) {
+      window.currentRouteId = currentRoute.route_id;
+    }
 
     // Populate base route dropdown
     const baseRouteSelect = document.getElementById('base-route-select');
     if (baseRouteSelect) {
       baseRouteSelect.innerHTML = zone2bRoutes.map(r =>
-        `<option value="${r.route_id}" ${r.route_id === routeId ? 'selected' : ''}>${formatDateFull(r.date)} - ${r.day}</option>`
+        `<option value="${r.route_id}" ${r.route_id === (currentRoute?.route_id || routeId) ? 'selected' : ''}>${formatDateFull(r.date)} - ${r.day}</option>`
       ).join('');
 
       baseRouteSelect.addEventListener('change', (e) => {
@@ -488,28 +707,313 @@ const PageControllers = {
     }
 
     // Load visited tasks table
-    loadVisitedTasksTable(routeId);
+    loadVisitedTasksTable(currentRoute?.route_id || routeId);
+  },
 
-    // Load saved scenarios list
-    loadSavedScenariosList();
+  'what-if': async () => {
+    ensureSidebarVisible();
+    UI.renderHeader('What-If Actions', 'Choose an analysis action');
+
+    // Load recent scenarios
+    const container = document.getElementById('what-if-recent-scenarios');
+    if (container) {
+      const recent = Scenarios.getRecent(3);
+      if (recent.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="padding:20px;"><div class="empty-state-text">No scenarios created yet. Start by selecting an action above.</div></div>';
+      } else {
+        container.innerHTML = recent.map(s => {
+          const removedCount = s.config?.removed_tasks?.length || 0;
+          const dateStr = new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          return `
+            <div class="scenario-item">
+              <div class="scenario-item-info">
+                <strong>${s.id.toUpperCase()}</strong>
+                <span>${s.name}</span>
+                <span class="text-muted text-sm">${dateStr} | ${removedCount} tasks removed</span>
+              </div>
+              <div class="scenario-item-actions">
+                <button class="btn-sm btn-secondary" onclick="navigateToPage('compare-scenarios', {scenario: '${s.id}'})">Compare</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
   },
 
   'comparison': async () => {
-    UI.renderHeader('Scenario Comparison', 'Compare V0 Baseline with optimized scenarios');
+    // Legacy redirect
+    navigateToPage('compare-scenarios');
+  },
 
-    // Populate scenario selector
-    const scenarioSelect = document.getElementById('scenario-version');
+  'saved-scenarios': async () => {
+    ensureSidebarVisible();
+    UI.renderHeader('Saved Scenarios', 'Manage and compare your what-if scenarios', {
+      rightHtml: '<button class="btn-primary btn-sm" onclick="navigateToPage(\'removing-visited\')">+ NEW SCENARIO</button>'
+    });
+
+    const grid = document.getElementById('scenarios-grid');
+    if (!grid) return;
+
+    const scenarios = Scenarios.list();
+
+    if (scenarios.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">&#128203;</div>
+          <div class="empty-state-title">No Scenarios Yet</div>
+          <div class="empty-state-text">Create your first what-if scenario to analyze route optimizations.</div>
+          <button class="btn-primary mt-20" onclick="navigateToPage('removing-visited')">+ Create New Scenario</button>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = scenarios.map(s => {
+      const removedCount = s.config?.removed_tasks?.length || 0;
+      const dateStr = new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const baseRouteName = s.baseRoute ? `${s.baseRoute.route_name} - ${s.baseRoute.day}` : 'N/A';
+      const baseline = s.config?.baseline;
+      const results = s.results;
+
+      // Calculate metric deltas
+      let costDelta = '', timeDelta = '', distDelta = '';
+      if (baseline && results) {
+        const costDiff = results.totalCost - baseline.totalCost;
+        const timeDiff = results.time - baseline.time;
+        const distDiff = results.distance - baseline.distance;
+        costDelta = `<span class="scenario-card-metric-value ${costDiff < 0 ? 'positive' : 'negative'}">${costDiff < 0 ? '' : '+'}${formatCurrency(costDiff)}</span>`;
+        timeDelta = `<span class="scenario-card-metric-value ${timeDiff < 0 ? 'positive' : 'negative'}">${timeDiff < 0 ? '' : '+'}${timeDiff.toFixed(0)} min</span>`;
+        distDelta = `<span class="scenario-card-metric-value ${distDiff < 0 ? 'positive' : 'negative'}">${distDiff < 0 ? '' : '+'}${distDiff.toFixed(1)} km</span>`;
+      }
+
+      return `
+        <div class="scenario-card">
+          <div class="scenario-card-header">
+            <div class="scenario-card-title">
+              <span class="badge badge-info">${s.id.toUpperCase()}</span>
+              <h3>${s.name}</h3>
+            </div>
+          </div>
+          <div class="scenario-card-info">
+            <div class="scenario-card-detail"><span class="text-muted">Base Route:</span> ${baseRouteName}</div>
+            <div class="scenario-card-detail"><span class="text-muted">Created:</span> ${dateStr}</div>
+            ${s.description ? `<div class="scenario-card-detail"><span class="text-muted">Note:</span> ${s.description}</div>` : ''}
+            <div class="scenario-card-detail"><span class="text-muted">Tasks Removed:</span> ${removedCount}</div>
+          </div>
+          ${baseline && results ? `
+          <div class="scenario-card-metrics">
+            <div class="scenario-card-metric">
+              <span class="scenario-card-metric-label">Cost</span>
+              ${costDelta}
+            </div>
+            <div class="scenario-card-metric">
+              <span class="scenario-card-metric-label">Time</span>
+              ${timeDelta}
+            </div>
+            <div class="scenario-card-metric">
+              <span class="scenario-card-metric-label">Distance</span>
+              ${distDelta}
+            </div>
+          </div>
+          ` : ''}
+          <div class="scenario-card-actions">
+            <button class="btn-sm btn-secondary" onclick="navigateToPage('compare-scenarios', {scenario: '${s.id}'})">Compare</button>
+            <button class="btn-sm btn-secondary" onclick="renameScenario('${s.id}')">Rename</button>
+            <button class="btn-sm btn-danger" onclick="deleteScenario('${s.id}')">Delete</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  'compare-scenarios': async () => {
+    ensureSidebarVisible();
+    UI.renderHeader('Compare Scenarios', 'Side-by-side comparison of scenarios');
+
+    const { params } = getPageParams();
+
+    // Populate both dropdowns
+    const scenarios = Scenarios.list();
+    const baselineSelect = document.getElementById('compare-left');
+    const scenarioSelect = document.getElementById('compare-right');
+
+    if (baselineSelect) {
+      baselineSelect.innerHTML = '<option value="v0">V0 - Current Operations (Baseline)</option>' +
+        scenarios.map(s => `<option value="${s.id}">${s.id.toUpperCase()} - ${s.name}</option>`).join('');
+    }
+
     if (scenarioSelect) {
-      const scenarios = Scenarios.list();
-      scenarioSelect.innerHTML = scenarios.length ?
-        '<option value="">-- Select a scenario --</option>' +
-        scenarios.map(s => `<option value="${s.id}">${s.id.toUpperCase()} - ${s.name}</option>`).join('') :
-        '<option value="" disabled>No scenarios yet. Create one in What-If Analysis.</option>';
+      if (scenarios.length === 0) {
+        scenarioSelect.innerHTML = '<option value="" disabled>No scenarios yet. Create one first.</option>';
+      } else {
+        scenarioSelect.innerHTML = '<option value="">-- Select a scenario --</option>' +
+          scenarios.map(s => `<option value="${s.id}">${s.id.toUpperCase()} - ${s.name}</option>`).join('');
 
-      // Auto-select first if available
-      if (scenarios.length > 0) {
-        scenarioSelect.value = scenarios[0].id;
-        updateComparisonTable();
+        // Auto-select from URL params or first scenario
+        if (params.scenario && scenarios.find(s => s.id === params.scenario)) {
+          scenarioSelect.value = params.scenario;
+          updateComparisonTable();
+        } else if (scenarios.length > 0) {
+          scenarioSelect.value = scenarios[0].id;
+          updateComparisonTable();
+        }
+      }
+    }
+  },
+
+  'frequency-analysis': async () => {
+    ensureSidebarVisible();
+    UI.renderHeader('Region Analysis', 'Historic frequency patterns across service points');
+
+    try {
+      await FrequencyAnalyzer.load();
+      FrequencyAnalyzer.analyze();
+      const summary = FrequencyAnalyzer.getSummary();
+      if (!summary) throw new Error('No analysis data');
+
+      // Hide loading, show content
+      hide('#freq-loading');
+      show('#freq-content');
+
+      // Render KPI cards
+      const kpiGrid = document.getElementById('freq-overview-grid');
+      if (kpiGrid) {
+        kpiGrid.innerHTML = `
+          <div class="freq-kpi-card">
+            <div class="freq-kpi-value">${summary.totalSPs}</div>
+            <div class="freq-kpi-label">Total Service Points</div>
+          </div>
+          <div class="freq-kpi-card highlight">
+            <div class="freq-kpi-value">${summary.optimizableCount}</div>
+            <div class="freq-kpi-label">Optimizable SPs</div>
+          </div>
+          <div class="freq-kpi-card">
+            <div class="freq-kpi-value">${formatPercentage(summary.avgSuccessRate)}</div>
+            <div class="freq-kpi-label">Avg Success Rate</div>
+          </div>
+          <div class="freq-kpi-card highlight">
+            <div class="freq-kpi-value">${formatCurrency(summary.potentialSavings.costPerWeek)}</div>
+            <div class="freq-kpi-label">Potential Savings/wk</div>
+          </div>
+        `;
+      }
+
+      // Render day distribution
+      const dayBody = document.getElementById('day-distribution-body');
+      if (dayBody) {
+        let dayHtml = '';
+        for (const day of DAY_ORDER) {
+          const dd = summary.dayDistribution[day];
+          if (!dd || dd.total === 0) continue;
+          const goodPct = (dd.good / dd.total * 100).toFixed(0);
+          const badPct = (dd.bad / dd.total * 100).toFixed(0);
+          dayHtml += `
+            <div class="day-distribution-row">
+              <div class="day-dist-label">${day}</div>
+              <div class="day-dist-bar-container">
+                <div class="day-dist-bar good" style="width:${goodPct}%"></div>
+                <div class="day-dist-bar bad" style="width:${badPct}%"></div>
+              </div>
+              <div class="day-dist-stats">
+                <span class="day-dist-good">${dd.good} good</span>
+                <span class="day-dist-bad">${dd.bad} bad</span>
+                <span class="day-dist-rate">${formatPercentage(dd.rate)}</span>
+              </div>
+            </div>
+          `;
+        }
+        dayBody.innerHTML = dayHtml;
+      }
+
+      // Render confidence grid
+      const confGrid = document.getElementById('confidence-grid');
+      if (confGrid) {
+        const cd = summary.confidenceDistribution;
+        confGrid.innerHTML = `
+          <div class="confidence-card high">
+            <div class="confidence-card-value">${cd.HIGH}</div>
+            <div class="confidence-card-label">HIGH</div>
+            <div class="confidence-card-desc">10+ samples</div>
+          </div>
+          <div class="confidence-card medium">
+            <div class="confidence-card-value">${cd.MEDIUM}</div>
+            <div class="confidence-card-label">MEDIUM</div>
+            <div class="confidence-card-desc">5-9 samples</div>
+          </div>
+          <div class="confidence-card low">
+            <div class="confidence-card-value">${cd.LOW}</div>
+            <div class="confidence-card-label">LOW</div>
+            <div class="confidence-card-desc">&lt;5 samples</div>
+          </div>
+        `;
+      }
+
+      // Render top 10 recommendations
+      const recBody = document.getElementById('recommendations-body');
+      if (recBody) {
+        const top = FrequencyAnalyzer.getOptimizable({ sortBy: 'savings' }).slice(0, 10);
+        if (top.length === 0) {
+          recBody.innerHTML = '<tr><td colspan="6" class="text-muted text-center">No optimization candidates found</td></tr>';
+        } else {
+          recBody.innerHTML = top.map(sp => `
+            <tr>
+              <td><strong>${sp.sp_id}</strong></td>
+              <td>${sp.currentFrequency}d/wk</td>
+              <td class="text-done">${sp.optimalFrequency}d/wk</td>
+              <td>${sp.removableDays.map(d => `<span class="day-badge bad">${d.slice(0, 3)}</span>`).join(' ')}</td>
+              <td><span class="confidence-badge ${sp.confidence.toLowerCase()}">${sp.confidence}</span></td>
+              <td class="text-done">${formatCurrency(sp.estimatedSavings.cost)}</td>
+            </tr>
+          `).join('');
+        }
+      }
+
+    } catch (err) {
+      console.error('Frequency analysis error:', err);
+      const loading = document.getElementById('freq-loading');
+      if (loading) {
+        loading.innerHTML = `
+          <div class="empty-state-icon">&#9888;</div>
+          <div class="empty-state-title">Failed to Load Data</div>
+          <div class="empty-state-text">${err.message || 'Check if the server is running and monthly data is available.'}</div>
+          <button class="btn-secondary mt-20" onclick="navigateToPage('what-if')">&#8592; Back to What-If Actions</button>
+        `;
+      }
+    }
+  },
+
+  'frequency-optimize': async () => {
+    ensureSidebarVisible();
+    UI.renderHeader('Optimize & Compare', 'Select service points to preview frequency optimization impact');
+
+    try {
+      await FrequencyAnalyzer.load();
+      FrequencyAnalyzer.analyze();
+
+      const optimizable = FrequencyAnalyzer.getOptimizable({ sortBy: 'savings' });
+
+      // Hide loading, show content
+      hide('#freq-opt-loading');
+      show('#freq-opt-content');
+
+      // Store for filter/sort
+      window._freqOptimizable = optimizable;
+      window._freqAllOptimizable = optimizable;
+
+      renderFreqSPCards(optimizable);
+      updateFreqImpactPreview([]);
+
+    } catch (err) {
+      console.error('Frequency optimize error:', err);
+      const loading = document.getElementById('freq-opt-loading');
+      if (loading) {
+        loading.innerHTML = `
+          <div class="empty-state-icon">&#9888;</div>
+          <div class="empty-state-title">Failed to Load Data</div>
+          <div class="empty-state-text">${err.message || 'Check if the server is running.'}</div>
+          <button class="btn-secondary mt-20" onclick="navigateToPage('frequency-analysis')">&#8592; Back to Region Analysis</button>
+        `;
       }
     }
   }
@@ -1173,12 +1677,24 @@ function saveScenario() {
 
   const selectedTasks = Array.from(checked).map(cb => cb.value);
   const route = getRouteById(window.currentRouteId);
+  const description = document.getElementById('scenario-description')?.value?.trim() || '';
 
-  // Create scenario
+  // Build baseRoute metadata
+  const baseRoute = route ? {
+    route_id: route.route_id,
+    route_name: route.route_name,
+    date: route.date,
+    day: route.day
+  } : null;
+
+  // Create scenario with enriched metadata
   const scenarioId = Scenarios.create(name, 'task-removal', {
     route_id: window.currentRouteId,
     removed_tasks: selectedTasks,
     baseline: window.baselineMetrics
+  }, {
+    description: description,
+    baseRoute: baseRoute
   });
 
   // Store V1 metrics for comparison
@@ -1189,15 +1705,15 @@ function saveScenario() {
     sps: baseline.sps - removedCount,
     distance: baseline.distance - (removedCount * 0.15),
     time: baseline.time - (removedCount * 3),
+    fuelCost: baseline.fuelCost * (1 - removedCount * 0.003),
+    laborCost: baseline.laborCost * (1 - removedCount * 0.006),
     totalCost: baseline.totalCost - (removedCount * 0.8),
+    fuelUsed: baseline.fuelUsed * (1 - removedCount * 0.003),
     co2: baseline.co2 - (removedCount * 0.05)
   };
 
   Scenarios.setResults(scenarioId, v1Metrics);
-  showNotification(`Scenario "${name}" saved successfully!`, 'success');
-
-  // Refresh saved scenarios list
-  loadSavedScenariosList();
+  showNotification(`Scenario "${name}" saved as ${scenarioId.toUpperCase()}!`, 'success');
   UI.updateSidebarStats();
 }
 
@@ -1232,65 +1748,80 @@ function loadSavedScenariosList() {
 
 // ─── Comparison Page Functions ────────────────────────────────────────────────
 
-// Update comparison table with selected scenario
+// Get metrics for a scenario or V0 baseline
+function getMetricsForSelection(value) {
+  if (value === 'v0' || !value) {
+    return getDefaultBaseline();
+  }
+  const scenario = Scenarios.get(value);
+  if (!scenario) return getDefaultBaseline();
+  const baseline = scenario.config?.baseline || getDefaultBaseline();
+  return scenario.results || estimateV1Metrics(baseline, scenario);
+}
+
+// Update comparison table with selected scenarios
 function updateComparisonTable() {
-  const scenarioSelect = document.getElementById('scenario-version');
-  const scenarioId = scenarioSelect?.value;
+  // Support both new (compare-left/compare-right) and legacy (scenario-version) selectors
+  const leftSelect = document.getElementById('compare-left');
+  const rightSelect = document.getElementById('compare-right') || document.getElementById('scenario-version');
 
-  if (!scenarioId) {
+  const leftValue = leftSelect?.value || 'v0';
+  const rightValue = rightSelect?.value;
+
+  if (!rightValue) {
     resetComparisonDisplay();
     return;
   }
 
-  const scenario = Scenarios.get(scenarioId);
-  if (!scenario) {
+  const baseline = getMetricsForSelection(leftValue);
+  const v1 = getMetricsForSelection(rightValue);
+
+  if (!baseline || !v1) {
     resetComparisonDisplay();
     return;
   }
 
-  // Get baseline and scenario metrics
-  const baseline = scenario.config?.baseline || window.baselineMetrics || getDefaultBaseline();
-  const v1 = scenario.results || estimateV1Metrics(baseline, scenario);
-
-  // Update V0 columns
+  // Update V0 (left) columns
   setText('cmp-v0-tasks', baseline.tasks);
   setText('cmp-v0-sps', baseline.sps);
   setText('cmp-v0-distance', formatDistance(baseline.distance));
   setText('cmp-v0-time', formatTime(baseline.time));
-  setText('cmp-v0-rate', formatPercentage(baseline.tasks > 0 ? (baseline.tasks - (scenario.config?.removed_tasks?.length || 0)) / baseline.tasks : 1));
+  setText('cmp-v0-rate', formatPercentage(baseline.tasks > 0 ? 1 : 0));
   setText('cmp-v0-fuel-cost', formatCurrency(baseline.fuelCost));
   setText('cmp-v0-labor-cost', formatCurrency(baseline.laborCost));
   setText('cmp-v0-total-cost', formatCurrency(baseline.totalCost));
-  setText('cmp-v0-fuel-used', baseline.fuelUsed?.toFixed(1) + ' L');
+  setText('cmp-v0-fuel-used', (baseline.fuelUsed || 0).toFixed(1) + ' L');
   setText('cmp-v0-co2', formatCO2(baseline.co2));
 
-  // Update V1 columns
+  // Update V1 (right) columns
   setText('cmp-v1-tasks', v1.tasks);
   setText('cmp-v1-sps', v1.sps);
   setText('cmp-v1-distance', formatDistance(v1.distance));
   setText('cmp-v1-time', formatTime(v1.time));
-  setText('cmp-v1-rate', '100%');
-  setText('cmp-v1-fuel-cost', formatCurrency(v1.fuelCost || baseline.fuelCost * 0.95));
-  setText('cmp-v1-labor-cost', formatCurrency(v1.laborCost || baseline.laborCost * 0.95));
+  setText('cmp-v1-rate', formatPercentage(v1.tasks > 0 ? 1 : 0));
+  setText('cmp-v1-fuel-cost', formatCurrency(v1.fuelCost || 0));
+  setText('cmp-v1-labor-cost', formatCurrency(v1.laborCost || 0));
   setText('cmp-v1-total-cost', formatCurrency(v1.totalCost));
-  setText('cmp-v1-fuel-used', (v1.fuelUsed || baseline.fuelUsed * 0.95).toFixed(1) + ' L');
+  setText('cmp-v1-fuel-used', (v1.fuelUsed || 0).toFixed(1) + ' L');
   setText('cmp-v1-co2', formatCO2(v1.co2));
 
   // Update delta columns
-  const removedTasks = scenario.config?.removed_tasks?.length || 0;
   setCompDelta('cmp-delta-tasks', v1.tasks - baseline.tasks);
   setCompDelta('cmp-delta-sps', v1.sps - baseline.sps);
   setCompDelta('cmp-delta-distance', v1.distance - baseline.distance, ' km');
   setCompDelta('cmp-delta-time', v1.time - baseline.time, ' min');
   setCompDelta('cmp-delta-rate', 0, '%');
-  setCompDelta('cmp-delta-fuel-cost', (v1.fuelCost || baseline.fuelCost * 0.95) - baseline.fuelCost, '', true);
-  setCompDelta('cmp-delta-labor-cost', (v1.laborCost || baseline.laborCost * 0.95) - baseline.laborCost, '', true);
+  setCompDelta('cmp-delta-fuel-cost', (v1.fuelCost || 0) - (baseline.fuelCost || 0), '', true);
+  setCompDelta('cmp-delta-labor-cost', (v1.laborCost || 0) - (baseline.laborCost || 0), '', true);
   setCompDelta('cmp-delta-total-cost', v1.totalCost - baseline.totalCost, '', true);
-  setCompDelta('cmp-delta-fuel-used', (v1.fuelUsed || baseline.fuelUsed * 0.95) - baseline.fuelUsed, ' L');
+  setCompDelta('cmp-delta-fuel-used', (v1.fuelUsed || 0) - (baseline.fuelUsed || 0), ' L');
   setCompDelta('cmp-delta-co2', v1.co2 - baseline.co2, ' kg');
 
-  // Update narrative
-  updateNarrative(scenario, baseline, v1);
+  // Update narrative if right side is a scenario
+  const scenario = Scenarios.get(rightValue);
+  if (scenario) {
+    updateNarrative(scenario, baseline, v1);
+  }
 }
 
 // Helper to set comparison delta
@@ -1397,20 +1928,22 @@ function resetComparisonDisplay() {
 
 // Reset comparison
 function resetComparison() {
-  const scenarioSelect = document.getElementById('scenario-version');
-  if (scenarioSelect) scenarioSelect.value = '';
+  const leftSelect = document.getElementById('compare-left');
+  const rightSelect = document.getElementById('compare-right') || document.getElementById('scenario-version');
+  if (leftSelect) leftSelect.value = 'v0';
+  if (rightSelect) rightSelect.value = '';
   resetComparisonDisplay();
   showNotification('Comparison reset', 'info');
 }
 
 // Create new scenario
 function createNewScenario() {
-  navigateToPage('what-if-analysis');
+  navigateToPage('removing-visited');
 }
 
 // Export comparison report
 function exportComparison() {
-  const scenarioSelect = document.getElementById('scenario-version');
+  const scenarioSelect = document.getElementById('scenario-version') || document.getElementById('compare-right');
   const scenarioId = scenarioSelect?.value;
 
   if (!scenarioId) {
@@ -1419,4 +1952,192 @@ function exportComparison() {
   }
 
   showNotification('Export feature coming soon...', 'info');
+}
+
+// Rename scenario
+function renameScenario(id) {
+  const scenario = Scenarios.get(id);
+  if (!scenario) return;
+
+  const newName = prompt('Enter new name:', scenario.name);
+  if (newName && newName.trim()) {
+    Scenarios.updateMetadata(id, { name: newName.trim() });
+    showNotification(`Scenario renamed to "${newName.trim()}"`, 'success');
+    // Refresh page
+    navigateToPage('saved-scenarios');
+  }
+}
+
+// Delete scenario
+function deleteScenario(id) {
+  const scenario = Scenarios.get(id);
+  if (!scenario) return;
+
+  if (confirm(`Delete scenario ${id.toUpperCase()} - "${scenario.name}"? This cannot be undone.`)) {
+    Scenarios.delete(id);
+    showNotification('Scenario deleted', 'info');
+    // Refresh page
+    navigateToPage('saved-scenarios');
+  }
+}
+
+// Swap comparison dropdowns
+function swapComparison() {
+  const left = document.getElementById('compare-left');
+  const right = document.getElementById('compare-right');
+  if (!left || !right) return;
+
+  const leftVal = left.value;
+  const rightVal = right.value;
+
+  // Check if values exist in opposite dropdown
+  if (leftVal && right.querySelector(`option[value="${leftVal}"]`)) {
+    right.value = leftVal;
+  }
+  if (rightVal && left.querySelector(`option[value="${rightVal}"]`)) {
+    left.value = rightVal;
+  }
+
+  updateComparisonTable();
+}
+
+// ─── Frequency Optimization Helpers ────────────────────────────────────────
+
+// Render SP recommendation cards into the list
+function renderFreqSPCards(spList) {
+  const container = document.getElementById('freq-sp-list');
+  if (!container) return;
+
+  if (!spList || spList.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding:40px 20px;">
+        <div class="empty-state-icon">&#128269;</div>
+        <div class="empty-state-title">No Matching Service Points</div>
+        <div class="empty-state-text">Try adjusting your filters.</div>
+      </div>
+    `;
+    return;
+  }
+
+  const countLabel = document.getElementById('freq-sp-count');
+  if (countLabel) countLabel.textContent = `${spList.length} service points`;
+
+  container.innerHTML = spList.map(sp => `
+    <div class="freq-sp-card" id="freq-card-${sp.sp_id}" data-sp="${sp.sp_id}">
+      <div class="freq-sp-card-header" onclick="toggleFreqSPCard('${sp.sp_id}')">
+        <label class="freq-sp-checkbox" onclick="event.stopPropagation()">
+          <input type="checkbox" name="freq-sp-select" value="${sp.sp_id}" onchange="onFreqSPSelectionChange()">
+        </label>
+        <div class="freq-sp-id">${sp.sp_id}</div>
+        <div class="freq-arrow">${sp.currentFrequency}d &#8594; ${sp.optimalFrequency}d</div>
+        <span class="confidence-badge ${sp.confidence.toLowerCase()}">${sp.confidence}</span>
+        <span class="freq-expand-icon">&#9654;</span>
+      </div>
+      <div class="freq-sp-card-body">
+        <div class="freq-sp-meta">
+          <span class="text-muted">Zone: ${sp.zone}</span>
+          <span class="text-muted">Assets: ${sp.assetTypes}</span>
+          <span class="text-muted">Overall: ${formatPercentage(sp.overallRate)}</span>
+        </div>
+        <table class="freq-day-table">
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Samples</th>
+              <th>Done</th>
+              <th>Rate</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${DAY_ORDER.map(day => {
+              const da = sp.dayAnalysis[day];
+              if (!da) return '';
+              return `
+                <tr class="freq-day-cell ${da.classification}">
+                  <td>${day}</td>
+                  <td>${da.total}</td>
+                  <td>${da.done}</td>
+                  <td>${formatPercentage(da.rate)}</td>
+                  <td><span class="day-badge ${da.classification}">${da.classification === 'good' ? 'Keep' : 'Remove'}</span></td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+        <div class="freq-sp-savings">
+          Est. weekly savings: <strong>${formatCurrency(sp.estimatedSavings.cost)}</strong>
+          (${sp.removableDays.length} trip${sp.removableDays.length !== 1 ? 's' : ''} removed)
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Toggle expand/collapse of an SP card
+function toggleFreqSPCard(spId) {
+  const card = document.getElementById(`freq-card-${spId}`);
+  if (card) card.classList.toggle('expanded');
+}
+
+// Handle SP selection change
+function onFreqSPSelectionChange() {
+  const checkboxes = document.querySelectorAll('input[name="freq-sp-select"]:checked');
+  const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+  updateFreqImpactPreview(selectedIds);
+}
+
+// Update the impact preview panel
+function updateFreqImpactPreview(selectedIds) {
+  const impact = FrequencyAnalyzer.calculateImpact(selectedIds);
+  const total = window._freqAllOptimizable?.length || 0;
+
+  setText('freq-impact-selected', `${selectedIds.length} of ${total}`);
+  setText('freq-impact-trips', impact ? `-${impact.trips}` : '0');
+  setText('freq-impact-distance', impact ? `-${impact.distance.toFixed(1)} km` : '0 km');
+  setText('freq-impact-time', impact ? `-${impact.time.toFixed(0)} min` : '0 min');
+  setText('freq-impact-cost', impact ? `-${formatCurrency(impact.cost).replace('$', '')}` : '$0.00');
+  setText('freq-impact-co2', impact ? `-${impact.co2.toFixed(2)} kg` : '0 kg');
+
+  const summaryEl = document.getElementById('freq-impact-summary');
+  if (summaryEl) {
+    if (selectedIds.length === 0) {
+      summaryEl.textContent = 'Select service points to see estimated impact.';
+    } else {
+      const days = impact.affectedDays.map(d => d.slice(0, 3)).join(', ');
+      summaryEl.innerHTML = `Optimizing <strong>${selectedIds.length} SPs</strong> across ${days} would save <strong>${formatCurrency(impact.cost)}/week</strong>.`;
+    }
+  }
+}
+
+// Filter frequency SP cards
+function filterFreqSPs() {
+  const dayFilter = document.getElementById('freq-filter-day')?.value || '';
+  const confFilter = document.getElementById('freq-filter-confidence')?.value || '';
+  const sortBy = document.getElementById('freq-sort')?.value || 'savings';
+
+  const options = { sortBy };
+  if (dayFilter) options.day = dayFilter;
+  if (confFilter) options.minConfidence = confFilter;
+
+  const filtered = FrequencyAnalyzer.getOptimizable(options);
+  window._freqOptimizable = filtered;
+  renderFreqSPCards(filtered);
+
+  // Reset selections
+  updateFreqImpactPreview([]);
+}
+
+// Select all visible frequency SPs
+function selectAllVisibleFreqSPs() {
+  const checkboxes = document.querySelectorAll('input[name="freq-sp-select"]');
+  checkboxes.forEach(cb => cb.checked = true);
+  onFreqSPSelectionChange();
+}
+
+// Deselect all frequency SPs
+function deselectAllFreqSPs() {
+  const checkboxes = document.querySelectorAll('input[name="freq-sp-select"]');
+  checkboxes.forEach(cb => cb.checked = false);
+  onFreqSPSelectionChange();
 }

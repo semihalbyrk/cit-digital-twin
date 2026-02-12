@@ -1,10 +1,23 @@
 /* CIT Digital Twin - Main Application */
 
+// Legacy route mapping for backwards compatibility
+const ROUTE_ALIASES = {
+  'route-selector': 'home',
+  'v0-overview': 'home',
+  'what-if-analysis': 'removing-visited',
+  'comparison': 'compare-scenarios'
+};
+
 // Hash-based routing
 const initRouting = () => {
   const handleRouteChange = () => {
     const { page } = getPageParams();
-    const pageName = page || 'route-selector';
+    let pageName = page || 'route-plan-selection';
+
+    // Apply legacy aliases
+    if (ROUTE_ALIASES[pageName]) {
+      pageName = ROUTE_ALIASES[pageName];
+    }
 
     // Update active nav
     setActiveNav(pageName);
@@ -46,7 +59,6 @@ const initApp = async () => {
   }
 
   // Update sidebar with data
-  UI.populateRouteNav();
   UI.updateSidebarStats();
 
   // Setup routing

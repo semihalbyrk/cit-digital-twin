@@ -86,8 +86,8 @@
 }
 
 .nav-item.active {
-  border-left-color: var(--accent-blue);
-  background-color: rgba(59, 130, 246, 0.15);
+  border-left-color: #36A734;
+  background-color: rgba(54, 167, 52, 0.15);
   color: var(--text-on-dark);
   font-weight: 500;
 }
@@ -180,7 +180,7 @@
 }
 
 .nav-child-item.active {
-  color: var(--accent-blue);
+  color: #36A734;
   font-weight: 500;
 }
 
@@ -192,7 +192,7 @@
 }
 
 .nav-child-item.active .nav-child-item-dot {
-  background-color: var(--accent-blue);
+  background-color: #36A734;
 }
 
 /* Sidebar Footer */

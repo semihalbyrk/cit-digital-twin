@@ -10037,7 +10037,7 @@
   {
     "route_id": "Z1-A-Day-Fri",
     "route_name": "Zone 1 A (Day)",
-    "day": "Friday",
+    "day": "Saturday",
     "date": "2026-01-10",
     "vehicle_id": "REL 1",
     "zone": "Zone 1",
@@ -10104,7 +10104,7 @@
   {
     "route_id": "Z1-B-Night-Fri",
     "route_name": "Zone 1 B (Night)",
-    "day": "Friday",
+    "day": "Saturday",
     "date": "2026-01-10",
     "vehicle_id": "REL 2",
     "zone": "Zone 1",
@@ -10161,7 +10161,7 @@
   {
     "route_id": "Z2-B-Day-Fri",
     "route_name": "Zone 2 B (Day)",
-    "day": "Friday",
+    "day": "Saturday",
     "date": "2026-01-10",
     "vehicle_id": "REL 4",
     "zone": "Zone 2",
@@ -13158,7 +13158,7 @@
   {
     "route_id": "Z3-A-Day-Fri",
     "route_name": "Zone 3 A (Day)",
-    "day": "Friday",
+    "day": "Saturday",
     "date": "2026-01-10",
     "vehicle_id": "REL 5",
     "zone": "Zone 3",
@@ -13215,7 +13215,7 @@
   {
     "route_id": "Z4-A-Day-Fri",
     "route_name": "Zone 4 A (Day)",
-    "day": "Friday",
+    "day": "Saturday",
     "date": "2026-01-10",
     "vehicle_id": "REL 7",
     "zone": "Zone 4",
@@ -13277,7 +13277,7 @@
   {
     "route_id": "Z2-C-Night-Fri",
     "route_name": "Zone 2 C (Night)",
-    "day": "Friday",
+    "day": "Saturday",
     "date": "2026-01-10",
     "vehicle_id": "REL 6",
     "zone": "Zone 2",
@@ -13334,7 +13334,7 @@
   {
     "route_id": "Z1-A-Day-Sat",
     "route_name": "Zone 1 A (Day)",
-    "day": "Saturday",
+    "day": "Sunday",
     "date": "2026-01-11",
     "vehicle_id": "REL 1",
     "zone": "Zone 1",
@@ -13396,7 +13396,7 @@
   {
     "route_id": "Z1-C-Day-Sat",
     "route_name": "Zone 1 C (Day)",
-    "day": "Saturday",
+    "day": "Sunday",
     "date": "2026-01-11",
     "vehicle_id": "REL 8",
     "zone": "Zone 1",
@@ -13453,7 +13453,7 @@
   {
     "route_id": "Z2-A-Day-Sat",
     "route_name": "Zone 2 A (Day)",
-    "day": "Saturday",
+    "day": "Sunday",
     "date": "2026-01-11",
     "vehicle_id": "REL 3",
     "zone": "Zone 2",
@@ -13510,7 +13510,7 @@
   {
     "route_id": "Z2-B-Day-Sat",
     "route_name": "Zone 2 B (Day)",
-    "day": "Saturday",
+    "day": "Sunday",
     "date": "2026-01-11",
     "vehicle_id": "REL 4",
     "zone": "Zone 2",
@@ -16507,7 +16507,7 @@
   {
     "route_id": "Z3-B-Night-Sat",
     "route_name": "Zone 3 B (Night)",
-    "day": "Saturday",
+    "day": "Sunday",
     "date": "2026-01-11",
     "vehicle_id": "REL 6",
     "zone": "Zone 3",
@@ -16564,7 +16564,7 @@
   {
     "route_id": "Z4-A-Day-Sat",
     "route_name": "Zone 4 A (Day)",
-    "day": "Saturday",
+    "day": "Sunday",
     "date": "2026-01-11",
     "vehicle_id": "REL 7",
     "zone": "Zone 4",
@@ -16621,7 +16621,7 @@
   {
     "route_id": "Z4-B-Night-Sat",
     "route_name": "Zone 4 B (Night)",
-    "day": "Saturday",
+    "day": "Sunday",
     "date": "2026-01-11",
     "vehicle_id": "REL 9",
     "zone": "Zone 4",

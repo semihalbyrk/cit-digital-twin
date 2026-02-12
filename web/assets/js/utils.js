@@ -121,7 +121,15 @@ const setActiveNav = (navId) => {
     item.classList.remove('active');
   });
   const activeItem = $(`[data-nav="${navId}"]`);
-  if (activeItem) activeItem.classList.add('active');
+  if (activeItem) {
+    activeItem.classList.add('active');
+    // Auto-expand parent collapsible sections
+    let parent = activeItem.closest('.nav-collapse');
+    while (parent) {
+      parent.classList.add('open');
+      parent = parent.parentElement.closest('.nav-collapse');
+    }
+  }
 };
 
 const navigateToPage = (pageName, params = {}) => {
@@ -142,11 +150,11 @@ const getPageParams = () => {
       params[key] = decodeURIComponent(value);
     });
   }
-  return { page: page || 'v0-overview', params };
+  return { page: page || 'route-plan-selection', params };
 };
 
 const goBack = () => {
-  navigateToPage('v0-overview');
+  navigateToPage('home');
 };
 
 // Sorting
@@ -277,7 +285,7 @@ const hexToRgba = (hex, alpha = 1) => {
 };
 
 // Day name mapping
-const DAY_ORDER = ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAY_ORDER = ['Tuesday', 'Wednesday', 'Thursday', 'Saturday', 'Sunday'];
 
 const getDayIndex = (day) => {
   return DAY_ORDER.indexOf(day);
@@ -288,8 +296,8 @@ const getDayDate = (day) => {
     'Tuesday': '2026-01-06',
     'Wednesday': '2026-01-07',
     'Thursday': '2026-01-08',
-    'Friday': '2026-01-10',
-    'Saturday': '2026-01-11'
+    'Saturday': '2026-01-10',
+    'Sunday': '2026-01-11'
   };
   return dates[day] || '';
 };

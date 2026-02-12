@@ -61,6 +61,11 @@ const API = {
     return this.get('/api/frequency-recommendations');
   },
 
+  // Load route task sequence (from raw CSV data)
+  async loadRouteTaskSequence(routeId) {
+    return this.get(`/api/routes/${encodeURIComponent(routeId)}/task-sequence`);
+  },
+
   // Run route simulation with custom parameters
   async runSimulation(routeId, parameters) {
     return this.post('/api/simulate', { route_id: routeId, parameters });
@@ -79,6 +84,11 @@ const API = {
   // Get scenario comparison
   async getComparison(baselineId, scenarioId) {
     return this.get(`/api/comparison?baseline=${baselineId}&scenario=${scenarioId}`);
+  },
+
+  // Load monthly task data for frequency analysis
+  async loadMonthlyTasks() {
+    return this.get('/api/monthly-tasks');
   }
 };
 
@@ -88,6 +98,7 @@ let dataCache = {
   routes: null,
   servicePoints: null,
   frequencies: null,
+  monthlyTasks: null,
   scenarios: {}
 };
 

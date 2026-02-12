@@ -1,0 +1,117 @@
+<div class="page frequency-optimize">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb mb-20">
+    <a href="#home">Home</a>
+    <span class="breadcrumb-sep">&#8250;</span>
+    <a href="#what-if">What-If Actions</a>
+    <span class="breadcrumb-sep">&#8250;</span>
+    <span>Optimize & Compare</span>
+  </div>
+
+  <!-- Loading State -->
+  <div id="freq-opt-loading" class="empty-state">
+    <div class="empty-state-icon">&#8987;</div>
+    <div class="empty-state-title">Loading Optimization Data...</div>
+    <div class="empty-state-text">Preparing service point recommendations.</div>
+  </div>
+
+  <!-- Content (hidden until loaded) -->
+  <div id="freq-opt-content" class="hidden">
+    <div class="freq-two-col">
+
+      <!-- Left Column: SP Cards -->
+      <div class="freq-left-col">
+        <!-- Filter Bar -->
+        <div class="freq-filter-bar">
+          <div class="freq-filter-group">
+            <label>Day</label>
+            <select id="freq-filter-day" onchange="filterFreqSPs()">
+              <option value="">All Days</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Saturday">Saturday</option>
+              <option value="Sunday">Sunday</option>
+            </select>
+          </div>
+          <div class="freq-filter-group">
+            <label>Confidence</label>
+            <select id="freq-filter-confidence" onchange="filterFreqSPs()">
+              <option value="">All</option>
+              <option value="HIGH">HIGH only</option>
+              <option value="MEDIUM">MEDIUM+</option>
+            </select>
+          </div>
+          <div class="freq-filter-group">
+            <label>Sort by</label>
+            <select id="freq-sort" onchange="filterFreqSPs()">
+              <option value="savings">Savings (high first)</option>
+              <option value="rate">Success rate (low first)</option>
+              <option value="frequency">Removable days (most first)</option>
+              <option value="confidence">Confidence (high first)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="freq-selection-bar">
+          <span id="freq-sp-count" class="text-muted">-- service points</span>
+          <div class="freq-selection-actions">
+            <button class="btn-secondary btn-sm" onclick="selectAllVisibleFreqSPs()">Select All</button>
+            <button class="btn-secondary btn-sm" onclick="deselectAllFreqSPs()">Deselect All</button>
+          </div>
+        </div>
+
+        <!-- SP Cards List -->
+        <div id="freq-sp-list"></div>
+      </div>
+
+      <!-- Right Column: Impact Preview -->
+      <div class="freq-right-col">
+        <div class="freq-impact-sticky">
+          <div class="card">
+            <div class="card-header">
+              <h2>Impact Preview</h2>
+            </div>
+            <div class="freq-impact-body">
+              <div class="freq-impact-selected">
+                Selected: <strong id="freq-impact-selected">0 of 0</strong>
+              </div>
+
+              <div class="freq-impact-grid">
+                <div class="freq-impact-row">
+                  <span class="freq-impact-label">Trips Removed</span>
+                  <span class="freq-impact-value negative" id="freq-impact-trips">0</span>
+                </div>
+                <div class="freq-impact-row">
+                  <span class="freq-impact-label">Distance Saved</span>
+                  <span class="freq-impact-value negative" id="freq-impact-distance">0 km</span>
+                </div>
+                <div class="freq-impact-row">
+                  <span class="freq-impact-label">Time Saved</span>
+                  <span class="freq-impact-value negative" id="freq-impact-time">0 min</span>
+                </div>
+                <div class="freq-impact-row">
+                  <span class="freq-impact-label">Cost Saved</span>
+                  <span class="freq-impact-value negative" id="freq-impact-cost">$0.00</span>
+                </div>
+                <div class="freq-impact-row">
+                  <span class="freq-impact-label">CO2 Reduced</span>
+                  <span class="freq-impact-value negative" id="freq-impact-co2">0 kg</span>
+                </div>
+              </div>
+
+              <div class="freq-impact-summary" id="freq-impact-summary">
+                Select service points to see estimated impact.
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-secondary mt-20" style="width:100%;" onclick="navigateToPage('frequency-analysis')">
+            &#8592; Back to Region Analysis
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

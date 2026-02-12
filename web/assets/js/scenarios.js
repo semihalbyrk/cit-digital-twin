@@ -5,7 +5,7 @@ const Scenarios = {
   scenarioCount: 0,
 
   // Create new scenario
-  create(name, type, config) {
+  create(name, type, config, options = {}) {
     this.scenarioCount++;
     const id = `v${this.scenarioCount}`;
 
@@ -14,6 +14,8 @@ const Scenarios = {
       name: name,
       type: type,
       config: config,
+      description: options.description || '',
+      baseRoute: options.baseRoute || null,
       createdAt: new Date().toISOString(),
       results: null,
       status: 'pending'
@@ -21,6 +23,28 @@ const Scenarios = {
 
     this.saveToStorage();
     return id;
+  },
+
+  // Update scenario metadata (name, description)
+  updateMetadata(id, updates) {
+    const scenario = this.scenarios[id];
+    if (!scenario) return false;
+    if (updates.name !== undefined) scenario.name = updates.name;
+    if (updates.description !== undefined) scenario.description = updates.description;
+    this.saveToStorage();
+    return true;
+  },
+
+  // Get scenarios filtered by base route ID
+  getByRoute(routeId) {
+    return Object.values(this.scenarios)
+      .filter(s => s.baseRoute && s.baseRoute.route_id === routeId)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  },
+
+  // Get N most recent scenarios
+  getRecent(limit = 3) {
+    return this.list().slice(0, limit);
   },
 
   // Get scenario by ID
@@ -33,6 +57,16 @@ const Scenarios = {
     return Object.values(this.scenarios).sort((a, b) =>
       new Date(b.createdAt) - new Date(a.createdAt)
     );
+  },
+
+  // Set results for a scenario
+  setResults(id, results) {
+    const scenario = this.scenarios[id];
+    if (!scenario) return;
+    scenario.results = results;
+    scenario.status = 'completed';
+    scenario.completedAt = new Date().toISOString();
+    this.saveToStorage();
   },
 
   // Delete scenario

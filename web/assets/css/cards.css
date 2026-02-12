@@ -4,7 +4,7 @@
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 16px;
   transition: all var(--transition-normal);
   cursor: default;
   position: relative;
@@ -125,7 +125,7 @@
 }
 
 .kpi-value {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;

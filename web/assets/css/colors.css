@@ -8,7 +8,7 @@
   --accent-blue: #3B82F6;
 
   /* Status Colors */
-  --color-done: #369B31;
+  --color-done: #36A734;
   --color-visited: #F59E0B;
   --color-todo: #E03C39;
   --color-info: #3B82F6;
@@ -83,7 +83,7 @@
 
 /* Chart.js color overrides */
 :root {
-  --chart-done: #369B31;
+  --chart-done: #36A734;
   --chart-visited: #F59E0B;
   --chart-todo: #E03C39;
   --chart-info: #3B82F6;

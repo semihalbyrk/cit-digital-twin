@@ -3,6 +3,7 @@
 import json
 import csv
 import random
+from datetime import datetime
 from pathlib import Path
 from flask import Flask, jsonify, request, send_from_directory
 
@@ -57,6 +58,262 @@ def get_data(key, loader):
 def clear_cache():
     """Clear data cache for reload."""
     _data_cache.clear()
+
+
+# Date-to-CSV filename mapping
+DATE_TO_CSV = {
+    '2026-01-06': '06.01',
+    '2026-01-07': '07.01',
+    '2026-01-08': '08.01',
+    '2026-01-10': '10.01',
+    '2026-01-11': '11.01'
+}
+
+RAW_DATA_DIR = DATA_DIR / 'raw'
+TASK_DATA_DIR = RAW_DATA_DIR / 'task_data'
+STATIC_DATA_DIR = RAW_DATA_DIR / 'static_data'
+DISTANCE_MATRIX_DIR = RAW_DATA_DIR / 'distance_matrix'
+
+
+def parse_arrive_time(time_str):
+    """Parse arrive time like '3:43:47 pm' into a sortable datetime.time."""
+    if not time_str or not time_str.strip():
+        return None
+    try:
+        return datetime.strptime(time_str.strip(), '%I:%M:%S %p').time()
+    except ValueError:
+        try:
+            return datetime.strptime(time_str.strip(), '%I:%M %p').time()
+        except ValueError:
+            return None
+
+
+def load_task_csv(date_str):
+    """Load CSV task data for a given date."""
+    csv_suffix = DATE_TO_CSV.get(date_str)
+    if not csv_suffix:
+        return []
+
+    csv_path = TASK_DATA_DIR / f'CIT_Tasks_Route - {csv_suffix}.csv'
+    if not csv_path.exists():
+        print(f"Warning: CSV not found: {csv_path}")
+        return []
+
+    tasks = []
+    with open(csv_path, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            tasks.append({
+                'task_id': row.get('Task ID', ''),
+                'route_name': row.get('Route Name', ''),
+                'vehicle_id': row.get('Vehicle ID', ''),
+                'date': row.get('Date', ''),
+                'arrive_time_raw': row.get('Arrive Time', ''),
+                'arrive_time': parse_arrive_time(row.get('Arrive Time', '')),
+                'operation': row.get('Operation', ''),
+                'task_status': row.get('Task Status', ''),
+                'planned_adhoc': row.get('Planned/Adhoc', ''),
+                'zone': row.get('Zone', ''),
+                'service_point': row.get('Service Point', ''),
+                'asset_types': row.get('Asset Types', ''),
+                'completed_asset_types': row.get('Completed Asset Types', ''),
+                'asset_collects': row.get('Asset Collects', '')
+            })
+    return tasks
+
+
+def load_monthly_csv():
+    """Load monthly region task data CSV for frequency analysis."""
+    csv_path = TASK_DATA_DIR / 'CIT_Monthly_Region_Task_Data.csv'
+    if not csv_path.exists():
+        print(f"Warning: Monthly CSV not found: {csv_path}")
+        return []
+
+    tasks = []
+    with open(csv_path, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            date_str = row.get('Date', '').strip()
+            try:
+                dt = datetime.strptime(date_str, '%d/%m/%Y')
+                iso_date = dt.strftime('%Y-%m-%d')
+                day_name = dt.strftime('%A')
+            except ValueError:
+                iso_date = date_str
+                day_name = ''
+            tasks.append({
+                'route_name': row.get('Route Name', ''),
+                'date': iso_date,
+                'day': day_name,
+                'task_status': row.get('Task Status', ''),
+                'planned_adhoc': row.get('Planned/Adhoc', ''),
+                'zone': row.get('Zone', '').strip(),
+                'service_point': row.get('Service Point', ''),
+                'asset_types': row.get('Asset Types', ''),
+                'completed_asset_types': row.get('Completed Asset Types', ''),
+                'asset_collects': row.get('Asset Collects', '')
+            })
+    return tasks
+
+
+def load_distance_matrix():
+    """Load distance matrix from CSV and cache."""
+    cache_key = 'distance_matrix'
+    if cache_key in _data_cache:
+        return _data_cache[cache_key]
+
+    matrix_path = DISTANCE_MATRIX_DIR / 'Distance_Matrix.csv'
+    if not matrix_path.exists():
+        print(f"Warning: Distance matrix not found: {matrix_path}")
+        return {}
+
+    matrix = {}
+    with open(matrix_path, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+        sp_names = headers[1:]  # Skip 'Service Point' column
+
+        for row in reader:
+            sp_from = row[0]
+            matrix[sp_from] = {}
+            for i, sp_to in enumerate(sp_names):
+                try:
+                    matrix[sp_from][sp_to] = float(row[i + 1])
+                except (ValueError, IndexError):
+                    matrix[sp_from][sp_to] = float('inf')
+
+    _data_cache[cache_key] = matrix
+    return matrix
+
+
+def build_route_sequence(tasks, route_name):
+    """Build correct route sequence from CSV task data."""
+    # Filter tasks for the specific route
+    route_tasks = [t for t in tasks if t['route_name'] == route_name]
+
+    # Separate by status
+    done_tasks = [t for t in route_tasks if t['task_status'] == 'Done']
+    visited_tasks = [t for t in route_tasks if t['task_status'] == 'Visited']
+    todo_tasks = [t for t in route_tasks if t['task_status'] not in ('Done', 'Visited')]
+
+    # Sort Done tasks by Arrive Time ASC
+    done_tasks.sort(key=lambda t: t['arrive_time'] or datetime.max.time())
+
+    # Build base sequence from Done tasks
+    sequence = []
+    for idx, task in enumerate(done_tasks):
+        arrive_str = ''
+        if task['arrive_time']:
+            arrive_str = task['arrive_time'].strftime('%I:%M:%S %p').lstrip('0')
+        sequence.append({
+            'sp_id': task['service_point'],
+            'type': 'done',
+            'status': 'Done',
+            'arrive_time': arrive_str,
+            'asset_types': task['asset_types'],
+            'completed_asset_types': task['completed_asset_types'],
+            'asset_collects': task['asset_collects']
+        })
+
+    # Insert Visited tasks near closest Done task using distance matrix
+    if visited_tasks and sequence:
+        matrix = load_distance_matrix()
+
+        for visited in visited_tasks:
+            v_sp = visited['service_point']
+            best_idx = 0
+            best_dist = float('inf')
+
+            # Find closest Done task in sequence
+            for i, seq_item in enumerate(sequence):
+                d_sp = seq_item['sp_id']
+                dist = matrix.get(v_sp, {}).get(d_sp, float('inf'))
+                if dist < best_dist:
+                    best_dist = dist
+                    best_idx = i
+
+            # Decide insertion: check distance to neighbor before vs after
+            insert_pos = best_idx + 1  # Default: insert after closest
+
+            if best_idx > 0 and best_idx < len(sequence) - 1:
+                before_sp = sequence[best_idx - 1]['sp_id'] if best_idx > 0 else None
+                after_sp = sequence[best_idx + 1]['sp_id'] if best_idx + 1 < len(sequence) else None
+
+                dist_before = matrix.get(v_sp, {}).get(before_sp, float('inf')) if before_sp else float('inf')
+                dist_after = matrix.get(v_sp, {}).get(after_sp, float('inf')) if after_sp else float('inf')
+
+                if dist_before < dist_after:
+                    insert_pos = best_idx
+                else:
+                    insert_pos = best_idx + 1
+
+            sequence.insert(insert_pos, {
+                'sp_id': visited['service_point'],
+                'type': 'visited',
+                'status': 'Visited',
+                'arrive_time': '',
+                'asset_types': visited['asset_types'],
+                'completed_asset_types': '',
+                'asset_collects': '0'
+            })
+
+    # Build final sequence with depot and disposal
+    completed_sequence = []
+
+    # Start: Depot
+    completed_sequence.append({
+        'seq': 0,
+        'sp_id': 'Al Bada Camp 10',
+        'type': 'depot_start',
+        'status': 'Start',
+        'arrive_time': '',
+        'asset_types': '',
+        'completed_asset_types': '',
+        'asset_collects': ''
+    })
+
+    # All Done + Visited tasks
+    for idx, item in enumerate(sequence):
+        completed_sequence.append({
+            'seq': idx + 1,
+            **item
+        })
+
+    # Disposal point
+    completed_sequence.append({
+        'seq': len(sequence) + 1,
+        'sp_id': 'Disposal',
+        'type': 'disposal',
+        'status': 'Disposal',
+        'arrive_time': '',
+        'asset_types': '',
+        'completed_asset_types': '',
+        'asset_collects': ''
+    })
+
+    # End: Depot
+    completed_sequence.append({
+        'seq': len(sequence) + 2,
+        'sp_id': 'Al Bada Camp 10',
+        'type': 'depot_end',
+        'status': 'End',
+        'arrive_time': '',
+        'asset_types': '',
+        'completed_asset_types': '',
+        'asset_collects': ''
+    })
+
+    # Build incomplete tasks list
+    incomplete_tasks = []
+    for task in todo_tasks:
+        incomplete_tasks.append({
+            'sp_id': task['service_point'],
+            'status': 'To Do',
+            'asset_types': task['asset_types'],
+            'planned_adhoc': task['planned_adhoc']
+        })
+
+    return completed_sequence, incomplete_tasks
 
 
 # ─── Static File Routes ──────────────────────────────────────────────────────
@@ -195,6 +452,49 @@ def get_visited_tasks(route_id):
     })
 
 
+@app.route('/api/routes/<path:route_id>/task-sequence')
+def get_route_task_sequence(route_id):
+    """Get the correctly sequenced task list for a route, built from raw CSV data."""
+    routes = get_data('routes', lambda: load_json('routes.json'))
+    route = next((r for r in routes if r['route_id'] == route_id), None)
+
+    if not route:
+        return jsonify({'error': f'Route {route_id} not found'}), 404
+
+    date_str = route.get('date', '')
+    route_name = route.get('route_name', '')
+
+    # Append " - V 2.0" if not present (CSV uses full name)
+    csv_route_name = route_name
+    if 'V 2.0' not in csv_route_name:
+        csv_route_name = f'{route_name} - V 2.0'
+
+    # Load raw CSV task data
+    tasks = load_task_csv(date_str)
+    if not tasks:
+        return jsonify({
+            'route_id': route_id,
+            'date': date_str,
+            'completed_sequence': [],
+            'incomplete_tasks': [],
+            'error': f'No CSV data found for date {date_str}'
+        })
+
+    # Build the route sequence
+    completed_sequence, incomplete_tasks = build_route_sequence(tasks, csv_route_name)
+
+    return jsonify({
+        'route_id': route_id,
+        'route_name': route_name,
+        'date': date_str,
+        'vehicle_id': route.get('vehicle_id', ''),
+        'total_completed': len(completed_sequence),
+        'total_incomplete': len(incomplete_tasks),
+        'completed_sequence': completed_sequence,
+        'incomplete_tasks': incomplete_tasks
+    })
+
+
 @app.route('/api/zone2b-routes')
 def get_zone2b_routes():
     """Get all Zone 2 B (Day) routes for route selector."""
@@ -219,6 +519,16 @@ def get_frequency_recommendations():
     """Get frequency analysis recommendations."""
     freqs = get_data('frequencies', lambda: load_json('frequency-recommendations.json'))
     return jsonify(freqs)
+
+
+@app.route('/api/monthly-tasks')
+def get_monthly_tasks():
+    """Get all monthly task data for frequency analysis."""
+    tasks = get_data('monthly_tasks', load_monthly_csv)
+    return jsonify({
+        'total': len(tasks),
+        'tasks': tasks
+    })
 
 
 @app.route('/api/simulate', methods=['POST'])

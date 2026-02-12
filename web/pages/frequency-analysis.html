@@ -1,0 +1,71 @@
+<div class="page frequency-analysis">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb mb-20">
+    <a href="#home">Home</a>
+    <span class="breadcrumb-sep">&#8250;</span>
+    <a href="#what-if">What-If Actions</a>
+    <span class="breadcrumb-sep">&#8250;</span>
+    <span>Region Analysis</span>
+  </div>
+
+  <!-- Loading State -->
+  <div id="freq-loading" class="empty-state">
+    <div class="empty-state-icon">&#8987;</div>
+    <div class="empty-state-title">Analyzing Historic Data...</div>
+    <div class="empty-state-text">Processing monthly task records for frequency patterns.</div>
+  </div>
+
+  <!-- Content (hidden until loaded) -->
+  <div id="freq-content" class="hidden">
+
+    <!-- Overview KPIs -->
+    <div class="freq-overview-grid" id="freq-overview-grid"></div>
+
+    <!-- Day Distribution -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Day-of-Week Distribution</h2>
+        <span class="text-muted text-sm">Success rate by scheduled collection day</span>
+      </div>
+      <div id="day-distribution-body"></div>
+    </div>
+
+    <!-- Confidence Distribution -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Confidence Levels</h2>
+        <span class="text-muted text-sm">Based on sample size per service point</span>
+      </div>
+      <div class="confidence-grid" id="confidence-grid"></div>
+    </div>
+
+    <!-- Top Recommendations -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Top Optimization Candidates</h2>
+        <span class="text-muted text-sm">Service points with highest savings potential</span>
+      </div>
+      <div class="table-responsive">
+        <table class="recommendations-table">
+          <thead>
+            <tr>
+              <th>Service Point</th>
+              <th>Current</th>
+              <th>Optimal</th>
+              <th>Removable Days</th>
+              <th>Confidence</th>
+              <th>Est. Savings/wk</th>
+            </tr>
+          </thead>
+          <tbody id="recommendations-body"></tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <button class="btn-primary" onclick="navigateToPage('frequency-optimize')">
+          View All in Optimizer &#8594;
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

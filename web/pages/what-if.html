@@ -1,0 +1,45 @@
+<div class="page what-if">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb mb-20">
+    <a href="#home">Home</a>
+    <span class="breadcrumb-sep">&#8250;</span>
+    <span>What-If Actions</span>
+  </div>
+
+  <!-- Action Cards Grid -->
+  <div class="action-cards-grid">
+    <div class="action-card" onclick="navigateToPage('removing-visited')">
+      <div class="action-card-icon">&#9881;</div>
+      <div class="action-card-body">
+        <h3>Removing Visited Tasks</h3>
+        <p>Analyze the impact of removing visited (uncollected) tasks from routes to optimize efficiency and reduce costs.</p>
+      </div>
+      <div class="action-card-footer">
+        <span class="action-card-arrow">&#8594;</span>
+      </div>
+    </div>
+
+    <div class="action-card" onclick="navigateToPage('frequency-analysis')">
+      <div class="action-card-icon">&#128200;</div>
+      <div class="action-card-body">
+        <h3>Frequency Optimization</h3>
+        <p>Optimize collection frequency based on fill rates, region analysis, and historical data patterns.</p>
+      </div>
+      <div class="action-card-footer">
+        <span class="badge badge-info">Phase 2</span>
+        <span class="action-card-arrow">&#8594;</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="card mt-20">
+    <div class="card-header">
+      <h2>Recent Scenarios</h2>
+      <button class="btn-secondary btn-sm" onclick="navigateToPage('saved-scenarios')">View All</button>
+    </div>
+    <div id="what-if-recent-scenarios">
+      <!-- Populated by JavaScript -->
+    </div>
+  </div>
+</div>
