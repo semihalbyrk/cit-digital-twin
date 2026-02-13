@@ -122,6 +122,302 @@ def load_task_csv(date_str):
     return tasks
 
 
+def normalize_route_name(route_name):
+    """Normalize route names for matching across data sources."""
+    name = (route_name or '').strip()
+    if name.endswith(' - V 2.0'):
+        return name[:-8].strip()
+    return name
+
+
+DEFAULT_SIMULATION_PARAMETERS = {
+    'speed': 35.0,
+    'service_time': 2.5,
+    'capacity': 20000.0,
+    'start_time': '09:00',
+    'end_time': '17:00',
+    'break_duration': 60.0,
+    'fuel_consumption': 6.0,
+    'fuel_price': 1.50,
+    'labor_rate': 25.0,
+    'disposal_cost': 15.0,
+    'disposal_time': 15.0,
+    'weight_1100L': 80.0,
+    'weight_240L': 32.0,
+}
+
+
+def _to_float(value, default):
+    try:
+        num = float(value)
+        if num != num:  # NaN guard
+            return float(default)
+        return num
+    except (TypeError, ValueError):
+        return float(default)
+
+
+def _extract_route_status_counts(route):
+    done = int(route.get('tasks_done', 0) or 0)
+    visited = int(route.get('tasks_visited', 0) or 0)
+    todo = int(route.get('tasks_todo', 0) or 0)
+    return done, visited, todo
+
+
+def build_routes_from_csv_and_base():
+    """Build canonical route list using raw CSV task counts + base metrics."""
+    base_routes = load_json('routes.json')
+    base_route_map = {}
+    for route in base_routes:
+        key = (route.get('date', ''), normalize_route_name(route.get('route_name', '')))
+        base_route_map.setdefault(key, []).append(route)
+
+    canonical_routes = []
+    for date_str in sorted(DATE_TO_CSV.keys()):
+        date_tasks = load_task_csv(date_str)
+        if not date_tasks:
+            continue
+
+        grouped = {}
+        for task in date_tasks:
+            raw_route_name = task.get('route_name', '')
+            grouped.setdefault(raw_route_name, []).append(task)
+
+        for raw_route_name, tasks in grouped.items():
+            normalized_name = normalize_route_name(raw_route_name)
+            base_candidates = base_route_map.get((date_str, normalized_name), [])
+            if not base_candidates:
+                print(f"Warning: No base route match for date={date_str}, route={raw_route_name}")
+                continue
+
+            base_route = base_candidates[0]
+            done = sum(1 for t in tasks if t.get('task_status') == 'Done')
+            visited = sum(1 for t in tasks if t.get('task_status') == 'Visited')
+            todo = sum(1 for t in tasks if t.get('task_status') not in ('Done', 'Visited'))
+            total_tasks = done + visited + todo
+            completion_rate = (done / total_tasks) if total_tasks > 0 else 0
+
+            vehicle_ids = sorted({(t.get('vehicle_id') or '').strip() for t in tasks if (t.get('vehicle_id') or '').strip()})
+            vehicle_id = vehicle_ids[0] if vehicle_ids else base_route.get('vehicle_id', '')
+
+            merged = dict(base_route)
+            merged['route_name'] = normalized_name
+            merged['tasks_done'] = done
+            merged['tasks_visited'] = visited
+            merged['tasks_todo'] = todo
+            merged['total_tasks'] = total_tasks
+            merged['completion_rate'] = completion_rate
+            merged['vehicle_id'] = vehicle_id
+
+            default_metrics = calculate_route_operational_metrics(merged, DEFAULT_SIMULATION_PARAMETERS)
+            merged['total_distance_km'] = round(default_metrics['distance_km'], 2)
+            merged['total_travel_time_minutes'] = round(default_metrics['travel_time_min'], 2)
+            merged['total_service_time_minutes'] = round(default_metrics['service_time_min'], 2)
+            merged['total_time_minutes'] = round(default_metrics['total_time_min'], 2)
+            merged['fuel_cost'] = round(default_metrics['fuel_cost'], 2)
+            merged['labor_cost'] = round(default_metrics['labor_cost'], 2)
+            merged['total_cost'] = round(default_metrics['total_cost'], 2)
+            merged['co2_emissions_kg'] = round(default_metrics['co2_kg'], 2)
+
+            canonical_routes.append(merged)
+
+    canonical_routes.sort(key=lambda r: (r.get('date', ''), r.get('route_id', '')))
+    return canonical_routes
+
+
+def get_canonical_routes():
+    """Get cached canonical route list backed by raw CSV data."""
+    return get_data('routes_canonical', build_routes_from_csv_and_base)
+
+
+def get_route_by_id(route_id):
+    """Get canonical route by route_id."""
+    routes = get_canonical_routes()
+    return next((r for r in routes if r.get('route_id') == route_id), None)
+
+
+def get_csv_tasks_for_route(route):
+    """Get raw CSV tasks for a canonical route."""
+    if not route:
+        return []
+
+    date_str = route.get('date', '')
+    route_name = route.get('route_name', '')
+    tasks = load_task_csv(date_str)
+    normalized_route_name = normalize_route_name(route_name)
+    return [t for t in tasks if normalize_route_name(t.get('route_name', '')) == normalized_route_name]
+
+
+def _build_completed_sequence_for_route(route):
+    """Build completed sequence for a route using raw CSV and sequence rules."""
+    if not route:
+        return []
+
+    date_str = route.get('date', '')
+    tasks_for_date = load_task_csv(date_str)
+    if not tasks_for_date:
+        return []
+
+    route_tasks = get_csv_tasks_for_route(route)
+    if not route_tasks:
+        return []
+
+    csv_route_name = route_tasks[0].get('route_name', '')
+    completed_sequence, _ = build_route_sequence(tasks_for_date, csv_route_name)
+    return completed_sequence
+
+
+def _compute_sequence_distance_km(sequence):
+    """Compute sequence distance and diagnostics using avg-known fallback for missing legs."""
+    if not sequence or len(sequence) < 2:
+        return {
+            'distance_km': 0.0,
+            'sequence_legs_total': 0,
+            'sequence_legs_known': 0,
+            'sequence_legs_missing': 0,
+            'distance_estimated_legs': 0,
+            'distance_estimation_method': 'avg_leg_fallback',
+        }
+
+    matrix = load_distance_matrix()
+    known_leg_distances = []
+    missing_legs = 0
+
+    for current_item, next_item in zip(sequence, sequence[1:]):
+        sp_from = current_item.get('sp_id', '')
+        sp_to = next_item.get('sp_id', '')
+        leg = matrix.get(sp_from, {}).get(sp_to, float('inf'))
+        if isinstance(leg, (int, float)) and leg != float('inf'):
+            known_leg_distances.append(float(leg))
+        else:
+            missing_legs += 1
+
+    known_legs = len(known_leg_distances)
+    avg_known_leg_distance = (sum(known_leg_distances) / known_legs) if known_legs > 0 else 0.0
+    distance_km = sum(known_leg_distances) + (avg_known_leg_distance * missing_legs)
+
+    return {
+        'distance_km': float(distance_km),
+        'sequence_legs_total': len(sequence) - 1,
+        'sequence_legs_known': known_legs,
+        'sequence_legs_missing': missing_legs,
+        'distance_estimated_legs': missing_legs,
+        'distance_estimation_method': 'avg_leg_fallback',
+    }
+
+
+def _compute_collected_waste_metrics(route_tasks, weight_1100L, weight_240L, done_count):
+    """Compute collected waste and collected container count from done tasks."""
+    collected_waste_kg = 0.0
+    collected_containers = 0.0
+
+    done_route_tasks = [t for t in route_tasks if t.get('task_status') == 'Done']
+    for task in done_route_tasks:
+        completed_type = str(task.get('completed_asset_types', '')).strip().lower()
+        asset_types = str(task.get('asset_types', '')).strip().lower()
+        collects_raw = str(task.get('asset_collects', '')).strip()
+
+        try:
+            collects = float(collects_raw) if collects_raw else 0.0
+        except (TypeError, ValueError):
+            collects = 0.0
+
+        if collects <= 0:
+            collects = 1.0
+
+        if '240' in completed_type:
+            expected_weight = weight_240L
+        elif '1100' in completed_type:
+            expected_weight = weight_1100L
+        elif '240' in asset_types and '1100' not in asset_types:
+            expected_weight = weight_240L
+        else:
+            expected_weight = weight_1100L
+
+        collected_containers += collects
+        collected_waste_kg += expected_weight * collects
+
+    if collected_waste_kg <= 0:
+        collected_containers = float(done_count)
+        collected_waste_kg = float(done_count) * float(weight_1100L)
+
+    return collected_waste_kg, collected_containers
+
+
+def calculate_route_operational_metrics(route, parameters=None):
+    """Calculate route operational metrics from completed sequence and parameters."""
+    params = dict(DEFAULT_SIMULATION_PARAMETERS)
+    if parameters:
+        params.update(parameters)
+
+    speed = _to_float(params.get('speed'), DEFAULT_SIMULATION_PARAMETERS['speed'])
+    service_time = _to_float(params.get('service_time'), DEFAULT_SIMULATION_PARAMETERS['service_time'])
+    capacity = _to_float(params.get('capacity'), DEFAULT_SIMULATION_PARAMETERS['capacity'])
+    break_duration = _to_float(params.get('break_duration'), DEFAULT_SIMULATION_PARAMETERS['break_duration'])
+    fuel_consumption = _to_float(params.get('fuel_consumption'), DEFAULT_SIMULATION_PARAMETERS['fuel_consumption'])
+    fuel_price = _to_float(params.get('fuel_price'), DEFAULT_SIMULATION_PARAMETERS['fuel_price'])
+    labor_rate = _to_float(params.get('labor_rate'), DEFAULT_SIMULATION_PARAMETERS['labor_rate'])
+    disposal_cost = _to_float(params.get('disposal_cost'), DEFAULT_SIMULATION_PARAMETERS['disposal_cost'])
+    disposal_time = _to_float(params.get('disposal_time'), DEFAULT_SIMULATION_PARAMETERS['disposal_time'])
+    weight_1100L = _to_float(params.get('weight_1100L'), DEFAULT_SIMULATION_PARAMETERS['weight_1100L'])
+    weight_240L = _to_float(params.get('weight_240L'), DEFAULT_SIMULATION_PARAMETERS['weight_240L'])
+
+    done, visited, todo = _extract_route_status_counts(route)
+    total_tasks = done + visited + todo
+    completed_tasks = done + visited
+
+    completed_sequence = _build_completed_sequence_for_route(route)
+    distance_diag = _compute_sequence_distance_km(completed_sequence)
+    distance_km = distance_diag['distance_km']
+    if distance_km <= 0:
+        distance_km = _to_float(route.get('total_distance_km'), 0.0)
+
+    travel_time_min = (distance_km / max(speed, 1.0)) * 60.0
+    service_time_min = completed_tasks * service_time
+    total_time_min = travel_time_min + service_time_min + break_duration + disposal_time
+
+    fuel_used_l = distance_km / max(fuel_consumption, 0.1)
+    fuel_cost_total = fuel_used_l * fuel_price
+    labor_cost_total = (total_time_min / 60.0) * labor_rate
+    total_cost = fuel_cost_total + labor_cost_total + disposal_cost
+    co2_kg = fuel_used_l * 2.31
+
+    route_tasks = get_csv_tasks_for_route(route)
+    collected_waste_kg, collected_containers = _compute_collected_waste_metrics(
+        route_tasks, weight_1100L, weight_240L, done
+    )
+
+    utilization_percent = None
+    if capacity > 0:
+        utilization_percent = (collected_waste_kg / capacity) * 100.0
+
+    return {
+        'done': done,
+        'visited': visited,
+        'todo': todo,
+        'total_tasks': total_tasks,
+        'completed_tasks': completed_tasks,
+        'distance_km': float(distance_km),
+        'travel_time_min': float(travel_time_min),
+        'service_time_min': float(service_time_min),
+        'break_time_min': float(break_duration),
+        'disposal_time_min': float(disposal_time),
+        'total_time_min': float(total_time_min),
+        'fuel_used_l': float(fuel_used_l),
+        'fuel_cost': float(fuel_cost_total),
+        'labor_cost': float(labor_cost_total),
+        'disposal_cost': float(disposal_cost),
+        'total_cost': float(total_cost),
+        'co2_kg': float(co2_kg),
+        'vehicle_capacity_kg': float(capacity),
+        'collected_waste_kg': float(collected_waste_kg),
+        'collected_containers': float(collected_containers),
+        'utilization_percent': float(utilization_percent) if utilization_percent is not None else None,
+        'rate': (done / max(total_tasks, 1)),
+        **distance_diag,
+    }
+
+
 def load_monthly_csv():
     """Load monthly region task data CSV for frequency analysis."""
     csv_path = TASK_DATA_DIR / 'CIT_Monthly_Region_Task_Data.csv'
@@ -347,7 +643,7 @@ def serve_components(filename):
 @app.route('/api/baseline/v0')
 def get_baseline():
     """Get V0 baseline aggregate data."""
-    routes = get_data('routes', lambda: load_json('routes.json'))
+    routes = get_canonical_routes()
 
     if not routes:
         return jsonify({'error': 'No route data available'}), 404
@@ -376,15 +672,14 @@ def get_baseline():
 @app.route('/api/routes')
 def get_routes():
     """Get all routes with metrics."""
-    routes = get_data('routes', lambda: load_json('routes.json'))
+    routes = get_canonical_routes()
     return jsonify(routes)
 
 
 @app.route('/api/routes/<path:route_id>')
 def get_route_detail(route_id):
     """Get single route detail."""
-    routes = get_data('routes', lambda: load_json('routes.json'))
-    route = next((r for r in routes if r['route_id'] == route_id), None)
+    route = get_route_by_id(route_id)
 
     if not route:
         return jsonify({'error': f'Route {route_id} not found'}), 404
@@ -395,24 +690,35 @@ def get_route_detail(route_id):
 @app.route('/api/routes/<path:route_id>/tasks')
 def get_route_tasks(route_id):
     """Get all tasks for a specific route with full details."""
-    routes = get_data('routes', lambda: load_json('routes.json'))
-    route = next((r for r in routes if r['route_id'] == route_id), None)
+    route = get_route_by_id(route_id)
 
     if not route:
         return jsonify({'error': f'Route {route_id} not found'}), 404
 
-    # Return service points as tasks with additional details
+    csv_tasks = get_csv_tasks_for_route(route)
     tasks = []
-    for idx, sp in enumerate(route.get('service_points', [])):
+    for idx, csv_task in enumerate(csv_tasks):
+        status = csv_task.get('task_status') or 'To Do'
+        status_key = status.strip().lower()
+        if status_key not in ('done', 'visited'):
+            status = 'To Do'
+
+        completed_type = (csv_task.get('completed_asset_types') or '').strip()
+        asset_types = (csv_task.get('asset_types') or '').strip()
+        container_type = completed_type or asset_types or 'Unknown'
         task = {
             'sequence': idx + 1,
-            'sp_id': sp.get('sp_id'),
-            'status': sp.get('status', 'Todo'),
-            'zone': sp.get('zone', route.get('zone')),
-            'container_type': sp.get('container_type', '1100L'),
-            'weight_kg': sp.get('weight_kg', 0),
-            'fill_rate': sp.get('fill_rate', 0.75),
-            'coordinates': sp.get('coordinates', '')
+            'task_id': csv_task.get('task_id', ''),
+            'sp_id': csv_task.get('service_point', ''),
+            'status': status,
+            'zone': csv_task.get('zone', route.get('zone')),
+            'container_type': container_type,
+            'weight_kg': None,
+            'fill_rate': None,
+            'coordinates': '',
+            'arrive_time': csv_task.get('arrive_time_raw', ''),
+            'planned_adhoc': csv_task.get('planned_adhoc', ''),
+            'asset_collects': csv_task.get('asset_collects', '')
         }
         tasks.append(task)
 
@@ -428,24 +734,29 @@ def get_route_tasks(route_id):
 @app.route('/api/routes/<path:route_id>/visited-tasks')
 def get_visited_tasks(route_id):
     """Get only visited (failed) tasks for scenario planning."""
-    routes = get_data('routes', lambda: load_json('routes.json'))
-    route = next((r for r in routes if r['route_id'] == route_id), None)
+    route = get_route_by_id(route_id)
 
     if not route:
         return jsonify({'error': f'Route {route_id} not found'}), 404
 
-    # Filter for visited tasks only
+    csv_tasks = get_csv_tasks_for_route(route)
     visited_tasks = []
-    for idx, sp in enumerate(route.get('service_points', [])):
-        if sp.get('status') == 'Visited':
+    for idx, csv_task in enumerate(csv_tasks):
+        if csv_task.get('task_status') == 'Visited':
+            completed_type = (csv_task.get('completed_asset_types') or '').strip()
+            asset_types = (csv_task.get('asset_types') or '').strip()
+            container_type = completed_type or asset_types or 'Unknown'
             task = {
                 'sequence': idx + 1,
-                'sp_id': sp.get('sp_id'),
+                'task_id': csv_task.get('task_id', ''),
+                'sp_id': csv_task.get('service_point', ''),
                 'status': 'Visited',
-                'zone': sp.get('zone', route.get('zone')),
-                'container_type': sp.get('container_type', '1100L'),
-                'weight_kg': sp.get('weight_kg', 0),
-                'fill_rate': sp.get('fill_rate', 0.75)
+                'zone': csv_task.get('zone', route.get('zone')),
+                'container_type': container_type,
+                'weight_kg': None,
+                'fill_rate': None,
+                'planned_adhoc': csv_task.get('planned_adhoc', ''),
+                'asset_collects': csv_task.get('asset_collects', '')
             }
             visited_tasks.append(task)
 
@@ -461,19 +772,13 @@ def get_visited_tasks(route_id):
 @app.route('/api/routes/<path:route_id>/task-sequence')
 def get_route_task_sequence(route_id):
     """Get the correctly sequenced task list for a route, built from raw CSV data."""
-    routes = get_data('routes', lambda: load_json('routes.json'))
-    route = next((r for r in routes if r['route_id'] == route_id), None)
+    route = get_route_by_id(route_id)
 
     if not route:
         return jsonify({'error': f'Route {route_id} not found'}), 404
 
     date_str = route.get('date', '')
     route_name = route.get('route_name', '')
-
-    # Append " - V 2.0" if not present (CSV uses full name)
-    csv_route_name = route_name
-    if 'V 2.0' not in csv_route_name:
-        csv_route_name = f'{route_name} - V 2.0'
 
     # Load raw CSV task data
     tasks = load_task_csv(date_str)
@@ -485,6 +790,9 @@ def get_route_task_sequence(route_id):
             'incomplete_tasks': [],
             'error': f'No CSV data found for date {date_str}'
         })
+
+    matching_task = next((t for t in tasks if normalize_route_name(t.get('route_name', '')) == normalize_route_name(route_name)), None)
+    csv_route_name = matching_task.get('route_name') if matching_task else route_name
 
     # Build the route sequence
     completed_sequence, incomplete_tasks = build_route_sequence(tasks, csv_route_name)
@@ -504,7 +812,7 @@ def get_route_task_sequence(route_id):
 @app.route('/api/zone2b-routes')
 def get_zone2b_routes():
     """Get all Zone 2 B (Day) routes for route selector."""
-    routes = get_data('routes', lambda: load_json('routes.json'))
+    routes = get_canonical_routes()
     zone2b_routes = [r for r in routes if r.get('route_name') == 'Zone 2 B (Day)']
 
     # Sort by date
@@ -544,142 +852,42 @@ def run_simulation():
     route_id = data.get('route_id')
     parameters = data.get('parameters', {})
 
-    routes = get_data('routes', lambda: load_json('routes.json'))
-    route = next((r for r in routes if r['route_id'] == route_id), None)
+    route = get_route_by_id(route_id)
 
     if not route:
         return jsonify({'error': f'Route {route_id} not found'}), 404
 
-    # Extended parameters with defaults
-    speed = parameters.get('speed', 35)  # km/h
-    service_time = parameters.get('service_time', 2.5)  # minutes per task
-    capacity = parameters.get('capacity', 20000)  # kg
-
-    # Time & traffic parameters
-    start_time = parameters.get('start_time', '09:00')
-    end_time = parameters.get('end_time', '17:00')
-    break_duration = parameters.get('break_duration', 60)  # minutes
-
-    # Cost parameters
-    fuel_consumption = parameters.get('fuel_consumption', 6.0)  # km per liter
-    fuel_price = parameters.get('fuel_price', 1.50)  # $ per liter
-    labor_rate = parameters.get('labor_rate', 25.0)  # $ per hour
-    disposal_cost = parameters.get('disposal_cost', 15.0)  # $ per trip
-
-    # Service time parameters
-    disposal_time = parameters.get('disposal_time', 15)  # minutes
-
-    # Container weights
-    weight_1100L = parameters.get('weight_1100L', 80)  # kg
-    weight_240L = parameters.get('weight_240L', 32)  # kg
-
-    # Base values from route
-    base_distance = route.get('total_distance_km', 50)
-    base_tasks = route.get('tasks_done', 0) + route.get('tasks_visited', 0) + route.get('tasks_todo', 0)
-    base_done = route.get('tasks_done', 0)
-
-    # Calculate travel time based on speed
-    travel_time = (base_distance / max(speed, 1)) * 60  # minutes
-
-    # Calculate service time
-    total_service_time = base_tasks * service_time  # minutes
-
-    # Total time including break and disposal
-    total_time = travel_time + total_service_time + break_duration + disposal_time
-
-    # Capacity impact on distance (more capacity = fewer disposal trips = less distance)
-    capacity_factor = min(1.0, 20000 / max(capacity, 1000))
-    adjusted_distance = base_distance * (0.85 + 0.15 * capacity_factor)
-
-    # Cost calculations
-    fuel_used = adjusted_distance / max(fuel_consumption, 0.1)  # liters
-    fuel_cost_total = fuel_used * fuel_price
-    labor_cost_total = (total_time / 60) * labor_rate
-    total_cost = fuel_cost_total + labor_cost_total + disposal_cost
-
-    # CO2 emissions (2.31 kg CO2 per liter of diesel)
-    co2_emissions = fuel_used * 2.31
-
-    # Calculate collected waste in kg:
-    # Waste Collected = Σ(Expected Weight x Collected Container) for Done tasks.
-    collected_waste_kg = 0.0
-    collected_containers = 0.0
-    date_str = route.get('date', '')
-    route_name = route.get('route_name', '')
-    csv_route_name = route_name if 'V 2.0' in route_name else f'{route_name} - V 2.0'
-
-    tasks = load_task_csv(date_str)
-    if tasks:
-        route_tasks = [t for t in tasks if t.get('route_name') == csv_route_name and t.get('task_status') == 'Done']
-        for task in route_tasks:
-            completed_type = str(task.get('completed_asset_types', '')).strip().lower()
-            asset_types = str(task.get('asset_types', '')).strip().lower()
-            collects_raw = str(task.get('asset_collects', '')).strip()
-
-            try:
-                collects = float(collects_raw) if collects_raw else 0.0
-            except (TypeError, ValueError):
-                collects = 0.0
-
-            if collects <= 0:
-                collects = 1.0
-
-            # Determine expected weight by collected container type.
-            if '240' in completed_type:
-                expected_weight = weight_240L
-            elif '1100' in completed_type:
-                expected_weight = weight_1100L
-            elif '240' in asset_types and '1100' not in asset_types:
-                expected_weight = weight_240L
-            else:
-                expected_weight = weight_1100L
-
-            collected_containers += collects
-            collected_waste_kg += expected_weight * collects
-
-    if collected_waste_kg <= 0:
-        # Fallback: use route service points (Done) with expected weights.
-        service_points = route.get('service_points', [])
-        done_points = [sp for sp in service_points if str(sp.get('status', '')).lower() == 'done']
-        if done_points:
-            for sp in done_points:
-                container_type = str(sp.get('container_type', '')).lower()
-                expected_weight = weight_240L if '240' in container_type else weight_1100L
-                collected_containers += 1.0
-                collected_waste_kg += expected_weight
-        else:
-            collected_containers = float(base_done)
-            collected_waste_kg = base_done * weight_1100L
-
-    utilization_percent = None
-    if capacity and capacity > 0:
-        utilization_percent = (collected_waste_kg / capacity) * 100
+    operational = calculate_route_operational_metrics(route, parameters)
 
     result = {
         'route_id': route_id,
         'parameters': parameters,
-        'done': base_done,
-        'visited': route.get('tasks_visited', 0),
-        'todo': route.get('tasks_todo', 0),
-        'total_tasks': base_tasks,
-        'distance': round(adjusted_distance, 2),
-        'travel_time': round(travel_time, 0),
-        'service_time': round(total_service_time, 0),
-        'break_time': break_duration,
-        'disposal_time': disposal_time,
-        'total_time': round(total_time, 0),
-        'fuel_used': round(fuel_used, 2),
-        'fuel_cost': round(fuel_cost_total, 2),
-        'labor_cost': round(labor_cost_total, 2),
-        'disposal_cost': disposal_cost,
-        'total_cost': round(total_cost, 2),
-        'co2': round(co2_emissions, 2),
-        'vehicle_capacity_kg': round(capacity, 2),
-        'collected_waste_kg': round(collected_waste_kg, 2),
-        'collected_containers': round(collected_containers, 2),
-        'utilization_percent': round(utilization_percent, 2) if utilization_percent is not None else None,
-        'utilization': round(utilization_percent, 2) if utilization_percent is not None else None,
-        'rate': round(base_done / max(base_tasks, 1), 4)
+        'done': operational['done'],
+        'visited': operational['visited'],
+        'todo': operational['todo'],
+        'total_tasks': operational['total_tasks'],
+        'distance': round(operational['distance_km'], 2),
+        'travel_time': round(operational['travel_time_min'], 0),
+        'service_time': round(operational['service_time_min'], 0),
+        'break_time': round(operational['break_time_min'], 0),
+        'disposal_time': round(operational['disposal_time_min'], 0),
+        'total_time': round(operational['total_time_min'], 0),
+        'fuel_used': round(operational['fuel_used_l'], 2),
+        'fuel_cost': round(operational['fuel_cost'], 2),
+        'labor_cost': round(operational['labor_cost'], 2),
+        'disposal_cost': round(operational['disposal_cost'], 2),
+        'total_cost': round(operational['total_cost'], 2),
+        'co2': round(operational['co2_kg'], 2),
+        'vehicle_capacity_kg': round(operational['vehicle_capacity_kg'], 2),
+        'collected_waste_kg': round(operational['collected_waste_kg'], 2),
+        'collected_containers': round(operational['collected_containers'], 2),
+        'utilization_percent': round(operational['utilization_percent'], 2) if operational['utilization_percent'] is not None else None,
+        'utilization': round(operational['utilization_percent'], 2) if operational['utilization_percent'] is not None else None,
+        'rate': round(operational['rate'], 4),
+        'sequence_legs_total': operational['sequence_legs_total'],
+        'sequence_legs_missing': operational['sequence_legs_missing'],
+        'distance_estimated_legs': operational['distance_estimated_legs'],
+        'distance_estimation_method': operational['distance_estimation_method'],
     }
 
     return jsonify(result)
@@ -696,7 +904,7 @@ def handle_scenarios():
     scenario_type = data.get('type', 'task-adjustment')
     config = data.get('config', {})
 
-    routes = get_data('routes', lambda: load_json('routes.json'))
+    routes = get_canonical_routes()
 
     # Calculate baseline totals
     total_done = sum(r.get('tasks_done', 0) for r in routes)

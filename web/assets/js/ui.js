@@ -6,7 +6,22 @@ const UI = {
   // Render sidebar
   renderSidebar() {
     const sidebar = document.getElementById('sidebar');
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    sidebar.classList.toggle('collapsed', isCollapsed);
+
     sidebar.innerHTML = `
+      <button
+        class="sidebar-toggle-btn"
+        id="sidebar-toggle-btn"
+        type="button"
+        aria-label="Toggle sidebar"
+        title="Toggle sidebar"
+        aria-expanded="${isCollapsed ? 'false' : 'true'}"
+        onclick="UI.toggleSidebarCollapse()"
+      >
+        <span id="sidebar-toggle-icon">${isCollapsed ? '&rsaquo;' : '&lsaquo;'}</span>
+      </button>
+
       <div class="sidebar-logo">
         <div class="sidebar-logo-icon-chip">
           <img class="sidebar-logo-icon" src="/components/evreka-icon.png" alt="Evreka logo">
@@ -83,6 +98,21 @@ const UI = {
         </div>
       </div>
     `;
+  },
+
+  // Desktop sidebar collapse toggle
+  toggleSidebarCollapse() {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    const collapsed = sidebar.classList.toggle('collapsed');
+    localStorage.setItem('sidebarCollapsed', collapsed ? 'true' : 'false');
+
+    const icon = document.getElementById('sidebar-toggle-icon');
+    if (icon) icon.innerHTML = collapsed ? '&rsaquo;' : '&lsaquo;';
+
+    const button = document.getElementById('sidebar-toggle-btn');
+    if (button) button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
   },
 
   // Toggle collapse
@@ -558,8 +588,8 @@ const PageControllers = {
       return;
     }
 
-    // Render header
-    UI.renderHeader('V0 Baseline Overview', 'Week of Jan 5-11, 2026 | All 33 Routes | 5 Days');
+    const uniqueDays = new Set(routes.map(r => r.date).filter(Boolean)).size;
+    UI.renderHeader('V0 Baseline Overview', `Week of Jan 5-11, 2026 | ${routes.length} Routes | ${uniqueDays} Days`);
 
     // Render KPI cards
     UI.renderKPICards('kpi-grid-overview', [
@@ -712,22 +742,8 @@ const PageControllers = {
       if (todoPct) todoPct.textContent = `(${todoPctVal.toFixed(1)}%)`;
     }
 
-    // Populate initial breakdown values from route data
-    const travelTime = route.total_travel_time_minutes || (totalTimeMin * 0.3);
-    const serviceTime = route.total_service_time_minutes || (totalTimeMin * 0.6);
-    setText('out-travel-time', formatTime(travelTime));
-    setText('out-service-time', formatTime(serviceTime));
-    setText('out-total-time', formatTime(totalTimeMin));
-    setText('out-distance', formatDistance(distanceKm));
-    setText('out-waste', `${formatNumber(collectedWasteKg)} kg`);
-    setText('out-fuel-cost', formatCurrency(route.fuel_cost || fuelUsed * 1.5));
-    setText('out-labor-cost', formatCurrency(route.labor_cost || (totalTimeMin / 60) * 25));
-    setText('out-total-cost', formatCurrency(route.total_cost || 0));
-    setText('out-fuel-used', `${fuelUsed.toFixed(1)} L`);
-    setText('out-co2', formatCO2(co2));
-    setText('out-utilization', utilizationPercent === null ? '--' : `${formatDecimal(utilizationPercent, 1)}%`);
-    setText('out-waste-per-km', formatRatioMetric(wastePerKm, 'kg/km'));
-    setText('out-waste-per-hr', formatRatioMetric(wastePerHr, 'kg/hr'));
+    // Ensure route detail outputs are parameter-accurate on initial page entry.
+    await runRouteSimulation();
   },
 
   'removing-visited': async () => {
