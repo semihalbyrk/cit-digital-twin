@@ -137,7 +137,7 @@ const UI = {
       </div>
       <div class="header-right">
         ${options.rightHtml || ''}
-        ${showDateFilter ? '<span class="header-date-filter">05.01 - 11.01.2026</span>' : ''}
+        ${showDateFilter ? '<span class="header-date-filter">' + (options.dateLabel || '05.01 - 11.01.2026') + '</span>' : ''}
       </div>
     `;
   },
@@ -940,7 +940,7 @@ const PageControllers = {
 
   'frequency-analysis': async () => {
     ensureSidebarVisible();
-    UI.renderHeader('Region Analysis', 'Historic frequency patterns across service points');
+    UI.renderHeader('Region Analysis', 'Historic frequency patterns across service points', { dateLabel: '10.11.2025 - 15.02.2026' });
 
     try {
       await FrequencyAnalyzer.load();
@@ -1061,7 +1061,7 @@ const PageControllers = {
 
   'frequency-optimize': async () => {
     ensureSidebarVisible();
-    UI.renderHeader('Optimize & Compare', 'Select service points to preview frequency optimization impact');
+    UI.renderHeader('Optimize & Compare', 'Select service points to preview frequency optimization impact', { dateLabel: '10.11.2025 - 15.02.2026' });
 
     try {
       await FrequencyAnalyzer.load();
@@ -2166,7 +2166,9 @@ function renderFreqSPCards(spList) {
   const countLabel = document.getElementById('freq-sp-count');
   if (countLabel) countLabel.textContent = `${spList.length} service points`;
 
-  container.innerHTML = spList.map(sp => `
+  container.innerHTML = spList.map(sp => {
+    const h = sp.heuristic || {};
+    return `
     <div class="freq-sp-card" id="freq-card-${sp.sp_id}" data-sp="${sp.sp_id}">
       <div class="freq-sp-card-header" onclick="toggleFreqSPCard('${sp.sp_id}')">
         <label class="freq-sp-checkbox" onclick="event.stopPropagation()">
@@ -2183,26 +2185,34 @@ function renderFreqSPCards(spList) {
           <span class="text-muted">Assets: ${sp.assetTypes}</span>
           <span class="text-muted">Overall: ${formatPercentage(sp.overallRate)}</span>
         </div>
+        <div class="freq-heuristic-detail">
+          <span class="text-muted">Avg/wk: <strong>${h.avgD?.toFixed(1) || '-'}</strong></span>
+          <span class="text-muted">Max/wk: <strong>${h.maxD || '-'}</strong></span>
+          <span class="text-muted">Base: <strong>${h.fBase || '-'}</strong></span>
+        </div>
         <table class="freq-day-table">
           <thead>
             <tr>
               <th>Day</th>
-              <th>Samples</th>
+              <th>Tasks</th>
               <th>Done</th>
-              <th>Rate</th>
-              <th>Status</th>
+              <th>Visited</th>
+              <th>Score</th>
+              <th>Decision</th>
             </tr>
           </thead>
           <tbody>
             ${DAY_ORDER.map(day => {
               const da = sp.dayAnalysis[day];
               if (!da) return '';
+              const scoreBar = '<div class="score-bar-bg"><div class="score-bar-fill" style="width:' + (da.score * 100) + '%;background:' + (da.classification === 'good' ? 'var(--accent-green)' : 'var(--accent-orange)') + '"></div></div>';
               return `
                 <tr class="freq-day-cell ${da.classification}">
-                  <td>${day}</td>
+                  <td>${day.slice(0, 3)}</td>
                   <td>${da.total}</td>
                   <td>${da.done}</td>
-                  <td>${formatPercentage(da.rate)}</td>
+                  <td>${da.visited}</td>
+                  <td><div class="score-cell">${scoreBar}<span>${(da.score * 100).toFixed(0)}%</span></div></td>
                   <td><span class="day-badge ${da.classification}">${da.classification === 'good' ? 'Keep' : 'Remove'}</span></td>
                 </tr>
               `;
@@ -2215,7 +2225,8 @@ function renderFreqSPCards(spList) {
         </div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 // Toggle expand/collapse of an SP card
