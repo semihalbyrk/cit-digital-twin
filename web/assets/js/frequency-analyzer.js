@@ -5,10 +5,11 @@ const FrequencyAnalyzer = {
   SUCCESS_THRESHOLD: 0.70,
   CONFIDENCE_HIGH: 10,
   CONFIDENCE_MEDIUM: 5,
-  COST_PER_TRIP: 20,        // $ per SP trip (fuel + labor + overhead)
+  SAVING_PER_REMOVED_TRIP: 1.5, // $ saving per removed SP trip
+  WEEKS_PER_YEAR: 52,
   DISTANCE_PER_TRIP: 0.15,  // km avg per SP visit
   TIME_PER_TRIP: 2.5,       // minutes service time per SP
-  CO2_PER_KM: 0.385,        // kg CO2 (2.31 kg/L diesel at 6 km/L)
+  CO2_PER_KM: 0.938,        // kg CO2e (2.68 kg/L at 0.35 L/km)
 
   // State
   data: null,
@@ -106,13 +107,17 @@ const FrequencyAnalyzer = {
 
     const canOptimize = badDays.length > 0 && optimalFrequency < currentFrequency;
 
-    // Estimated weekly savings if bad days removed
+    // Annual savings model:
+    // removed trips per week * $1.5 * 52 weeks
     const removedTripsPerWeek = badDays.length;
+    const removedTripsPerYear = removedTripsPerWeek * this.WEEKS_PER_YEAR;
     const estimatedSavings = {
       trips: removedTripsPerWeek,
+      tripsPerYear: removedTripsPerYear,
       distance: removedTripsPerWeek * this.DISTANCE_PER_TRIP,
       time: removedTripsPerWeek * this.TIME_PER_TRIP,
-      cost: removedTripsPerWeek * this.COST_PER_TRIP,
+      cost: removedTripsPerWeek * this.SAVING_PER_REMOVED_TRIP * this.WEEKS_PER_YEAR,
+      weeklyCost: removedTripsPerWeek * this.SAVING_PER_REMOVED_TRIP,
       co2: removedTripsPerWeek * this.DISTANCE_PER_TRIP * this.CO2_PER_KM
     };
 
@@ -180,9 +185,11 @@ const FrequencyAnalyzer = {
     // Total potential savings (all optimizable SPs)
     const potentialSavings = {
       tripsPerWeek: optimizableSPs.reduce((s, sp) => s + sp.estimatedSavings.trips, 0),
+      tripsPerYear: optimizableSPs.reduce((s, sp) => s + (sp.estimatedSavings.tripsPerYear || 0), 0),
       distancePerWeek: optimizableSPs.reduce((s, sp) => s + sp.estimatedSavings.distance, 0),
       timePerWeek: optimizableSPs.reduce((s, sp) => s + sp.estimatedSavings.time, 0),
-      costPerWeek: optimizableSPs.reduce((s, sp) => s + sp.estimatedSavings.cost, 0),
+      costPerYear: optimizableSPs.reduce((s, sp) => s + sp.estimatedSavings.cost, 0),
+      costPerWeek: optimizableSPs.reduce((s, sp) => s + (sp.estimatedSavings.weeklyCost || 0), 0),
       co2PerWeek: optimizableSPs.reduce((s, sp) => s + sp.estimatedSavings.co2, 0)
     };
 

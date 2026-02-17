@@ -37,7 +37,7 @@
                 <span class="parameter-label">Start Time</span>
               </div>
               <div class="input-simple">
-                <input type="time" id="start-time" value="09:00">
+                <input type="time" id="start-time" value="06:00">
               </div>
             </div>
             <div class="parameter-group">
@@ -45,7 +45,7 @@
                 <span class="parameter-label">End Time</span>
               </div>
               <div class="input-simple">
-                <input type="time" id="end-time" value="17:00">
+                <input type="time" id="end-time" value="18:00">
               </div>
             </div>
             <div class="parameter-group">
@@ -86,14 +86,25 @@
           </div>
           <div class="param-section-body">
             <div class="parameter-group">
-              <div class="parameter-header"><span class="parameter-label">Fuel Consumption</span></div>
+              <div class="parameter-header"><span class="parameter-label">Fuel Consumption Rate</span></div>
               <div class="input-with-buttons">
-                <div class="input-buttons"><button onclick="adjustParameter('fuel-consumption', -0.5)">-</button></div>
+                <div class="input-buttons"><button onclick="adjustParameter('fuel-consumption', -0.01)">-</button></div>
                 <div class="input-with-unit">
-                  <input type="number" id="fuel-consumption" value="6.0" min="2" max="15" step="0.5">
-                  <span class="input-unit">km/L</span>
+                  <input type="number" id="fuel-consumption" value="0.35" min="0.05" max="1.5" step="0.01">
+                  <span class="input-unit">L/km</span>
                 </div>
-                <div class="input-buttons"><button onclick="adjustParameter('fuel-consumption', 0.5)">+</button></div>
+                <div class="input-buttons"><button onclick="adjustParameter('fuel-consumption', 0.01)">+</button></div>
+              </div>
+            </div>
+            <div class="parameter-group">
+              <div class="parameter-header"><span class="parameter-label">Emission Factor</span></div>
+              <div class="input-with-buttons">
+                <div class="input-buttons"><button onclick="adjustParameter('emission-factor', -0.01)">-</button></div>
+                <div class="input-with-unit">
+                  <input type="number" id="emission-factor" value="2.68" min="1.0" max="5.0" step="0.01">
+                  <span class="input-unit">kgCO2e/L</span>
+                </div>
+                <div class="input-buttons"><button onclick="adjustParameter('emission-factor', 0.01)">+</button></div>
               </div>
             </div>
             <div class="parameter-group">
@@ -145,7 +156,7 @@
               <div class="input-with-buttons">
                 <div class="input-buttons"><button onclick="adjustParameter('service-time', -0.5)">-</button></div>
                 <div class="input-with-unit">
-                  <input type="number" id="service-time" value="2.5" min="0.5" max="10" step="0.5">
+                  <input type="number" id="service-time" value="1.5" min="0.5" max="10" step="0.5">
                   <span class="input-unit">min</span>
                 </div>
                 <div class="input-buttons"><button onclick="adjustParameter('service-time', 0.5)">+</button></div>

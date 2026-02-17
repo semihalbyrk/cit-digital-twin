@@ -705,19 +705,21 @@ const PageControllers = {
     const wastePerHr = totalTimeHours > 0 ? (collectedWasteKg / totalTimeHours) : null;
     const doneShare = totalTasks > 0 ? route.tasks_done / totalTasks : 0;
 
+    const actualKpis = getActualKpisForRoute(route);
+
     // Render compact KPI cards
     UI.renderKPICards('route-kpi-grid', [
       { icon: '&#10003;', label: 'Done', value: formatNumber(route.tasks_done), subtext: `${formatPercentage(doneShare)} of total`, status: 'done', compact: true },
       { icon: '&#9673;', label: 'Visited', value: formatNumber(route.tasks_visited), subtext: 'Failed attempts', status: 'visited', compact: true },
       { icon: '&#9744;', label: 'To-Do', value: formatNumber(route.tasks_todo), subtext: 'Not attempted', status: 'todo', compact: true },
-      { icon: '&#9672;', label: 'Distance', value: formatDistance(distanceKm), subtext: 'Total route', status: 'info', compact: true },
-      { icon: '&#9201;', label: 'Time', value: formatTime(totalTimeMin), subtext: 'Including breaks', status: 'info', compact: true },
+      { icon: '&#9672;', label: 'Distance', value: formatDistance(distanceKm), subtext: withActualKpiSubtext('Total route', actualKpis?.distance), status: 'info', compact: true },
+      { icon: '&#9201;', label: 'Time', value: formatTime(totalTimeMin), subtext: withActualKpiSubtext('Including breaks', actualKpis?.time), status: 'info', compact: true },
       { icon: '$', label: 'Cost', value: formatCurrency(route.total_cost || 0), subtext: 'All inclusive', status: 'info', compact: true },
       { icon: '&#128203;', label: 'Waste', value: `${formatNumber(collectedWasteKg)} kg`, subtext: 'Collected waste', status: 'info', compact: true },
       { icon: '&#9889;', label: 'Vehicle Utilization', value: utilizationPercent === null ? '--' : `${formatDecimal(utilizationPercent, 1)}%`, subtext: `Capacity ${formatNumber(vehicleCapacityKg)} kg`, status: utilizationPercent !== null && utilizationPercent >= 70 ? 'done' : 'visited', compact: true },
       { icon: '&#128668;', label: 'Waste per km', value: formatRatioMetric(wastePerKm, 'kg/km'), subtext: 'Collected / distance', status: 'info', compact: true },
       { icon: '&#9203;', label: 'Waste per hr', value: formatRatioMetric(wastePerHr, 'kg/hr'), subtext: 'Collected / total time', status: 'info', compact: true },
-      { icon: '&#9729;', label: 'CO2', value: formatCO2(co2), subtext: 'Emissions', status: 'info', compact: true }
+      { icon: '&#9729;', label: 'CO2', value: formatCO2(co2), subtext: withActualKpiSubtext('Emissions', actualKpis?.co2), status: 'info', compact: true }
     ]);
 
     // Render status distribution bar
@@ -967,8 +969,8 @@ const PageControllers = {
             <div class="freq-kpi-label">Avg Success Rate</div>
           </div>
           <div class="freq-kpi-card highlight">
-            <div class="freq-kpi-value">${formatCurrency(summary.potentialSavings.costPerWeek)}</div>
-            <div class="freq-kpi-label">Potential Savings/wk</div>
+            <div class="freq-kpi-value">${formatCurrency(summary.potentialSavings.costPerYear)}</div>
+            <div class="freq-kpi-label">Potential Savings/year</div>
           </div>
         `;
       }
@@ -1377,6 +1379,22 @@ function resetParameters() {
   showNotification('Parameters reset to defaults', 'info');
 }
 
+function getActualKpisForRoute(route) {
+  if (!route) return null;
+  if (route.route_id !== 'Z2-B-Day-Tue' || route.date !== '2026-01-06') return null;
+
+  return {
+    time: '11H 27m',
+    distance: '120.18 km',
+    co2: '112.73 kg CO\u2082e'
+  };
+}
+
+function withActualKpiSubtext(baseText, actualText) {
+  if (!actualText) return baseText;
+  return `${baseText} | Actual: ${actualText}`;
+}
+
 // Run route simulation
 async function runRouteSimulation() {
   const routeId = window.currentRouteId;
@@ -1422,20 +1440,21 @@ async function runRouteSimulation() {
         : (capacityKg > 0 ? (collectedWasteKg / capacityKg) * 100 : null);
       const wastePerKm = distanceKm > 0 ? (collectedWasteKg / distanceKm) : null;
       const wastePerHr = totalTimeHours > 0 ? (collectedWasteKg / totalTimeHours) : null;
+      const actualKpis = getActualKpisForRoute(route);
 
       // Update KPIs with result (compact)
       UI.renderKPICards('route-kpi-grid', [
         { icon: '&#10003;', label: 'Done', value: formatNumber(result.done || 0), subtext: `${formatPercentage(doneShare)} of total`, status: 'done', compact: true },
         { icon: '&#9673;', label: 'Visited', value: formatNumber(result.visited || 0), subtext: 'Failed attempts', status: 'visited', compact: true },
         { icon: '&#9744;', label: 'To-Do', value: formatNumber(result.todo || 0), subtext: 'Not attempted', status: 'todo', compact: true },
-        { icon: '&#9672;', label: 'Distance', value: formatDistance(distanceKm), subtext: 'Total route', status: 'info', compact: true },
-        { icon: '&#9201;', label: 'Time', value: formatTime(totalTimeMin), subtext: 'Including breaks', status: 'info', compact: true },
+        { icon: '&#9672;', label: 'Distance', value: formatDistance(distanceKm), subtext: withActualKpiSubtext('Total route', actualKpis?.distance), status: 'info', compact: true },
+        { icon: '&#9201;', label: 'Time', value: formatTime(totalTimeMin), subtext: withActualKpiSubtext('Including breaks', actualKpis?.time), status: 'info', compact: true },
         { icon: '$', label: 'Cost', value: formatCurrency(result.total_cost || 0), subtext: 'All inclusive', status: 'info', compact: true },
         { icon: '&#128203;', label: 'Waste', value: `${formatNumber(collectedWasteKg)} kg`, subtext: 'Collected waste', status: 'info', compact: true },
         { icon: '&#9889;', label: 'Vehicle Utilization', value: utilizationPercent === null ? '--' : `${formatDecimal(utilizationPercent, 1)}%`, subtext: `Capacity ${formatNumber(capacityKg)} kg`, status: utilizationPercent !== null && utilizationPercent >= 70 ? 'done' : 'visited', compact: true },
         { icon: '&#128668;', label: 'Waste per km', value: formatRatioMetric(wastePerKm, 'kg/km'), subtext: 'Collected / distance', status: 'info', compact: true },
         { icon: '&#9203;', label: 'Waste per hr', value: formatRatioMetric(wastePerHr, 'kg/hr'), subtext: 'Collected / total time', status: 'info', compact: true },
-        { icon: '&#9729;', label: 'CO2', value: formatCO2(result.co2 || 0), subtext: 'Emissions', status: 'info', compact: true }
+        { icon: '&#9729;', label: 'CO2', value: formatCO2(result.co2 || 0), subtext: withActualKpiSubtext('Emissions', actualKpis?.co2), status: 'info', compact: true }
       ]);
 
       // Update simulation results section
@@ -2191,8 +2210,8 @@ function renderFreqSPCards(spList) {
           </tbody>
         </table>
         <div class="freq-sp-savings">
-          Est. weekly savings: <strong>${formatCurrency(sp.estimatedSavings.cost)}</strong>
-          (${sp.removableDays.length} trip${sp.removableDays.length !== 1 ? 's' : ''} removed)
+          Est. annual savings: <strong>${formatCurrency(sp.estimatedSavings.cost)}</strong>
+          (${sp.removableDays.length} trip${sp.removableDays.length !== 1 ? 's' : ''} removed weekly)
         </div>
       </div>
     </div>
@@ -2230,7 +2249,7 @@ function updateFreqImpactPreview(selectedIds) {
       summaryEl.textContent = 'Select service points to see estimated impact.';
     } else {
       const days = impact.affectedDays.map(d => d.slice(0, 3)).join(', ');
-      summaryEl.innerHTML = `Optimizing <strong>${selectedIds.length} SPs</strong> across ${days} would save <strong>${formatCurrency(impact.cost)}/week</strong>.`;
+      summaryEl.innerHTML = `Optimizing <strong>${selectedIds.length} SPs</strong> across ${days} would save <strong>${formatCurrency(impact.cost)}/year</strong>.`;
     }
   }
 }
